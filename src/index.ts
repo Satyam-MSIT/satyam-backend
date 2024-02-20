@@ -12,7 +12,7 @@ app.use(cors({ origin: [CORS], maxAge: 600, methods: ["GET", "POST", "PUT", "DEL
 app.use(express.json());
 app.use(compression());
 
-app.get("/", (_, res) => res.send("Hello World!"));
+app.get("/", (_, res) => res.send("Satyam backend is running!"));
 app.use("/auth", authRouter);
 app.use("/journal", journalRouter);
 
