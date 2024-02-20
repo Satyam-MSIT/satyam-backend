@@ -19,9 +19,9 @@ const url = RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 
 router.post("/add", csrf, upload.single("file"), checksize, async (req, res) => {
   const { body, file, id } = req;
-  const { originalname, filename, path, size } = file!;
   try {
     const { title, description } = await addSchema.parseAsync(body);
+    const { originalname, filename, path, size } = file!;
 
     let link = sign(`${url}/file/download/${filename}`, LINK_SECRET);
     const journal = await Journal.create({ user: id, title, description, link, name: originalname, filename, size });
@@ -33,14 +33,14 @@ router.post("/add", csrf, upload.single("file"), checksize, async (req, res) => 
   } catch {
     try {
       res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
-      deleteFile(path);
+      deleteFile(file);
     } catch {}
   }
 });
 
-router.get("/download/:id", async (req, res) => {
+router.get("/download/:filename", async (req, res) => {
   try {
-    res.download(`uploads/${req.params.id}`);
+    res.download(`uploads/${req.params.filename}`);
   } catch {
     res.status(500).json({ success: false, error: "Something went wrong! Try again..." });
   }
