@@ -9,6 +9,7 @@ import csrf from "../middlewares/csrf";
 import { usePromises } from "../modules/promise";
 import { deleteFile } from "../modules/file";
 import { addSchema } from "../schemas/journal";
+import fetchuser from "../middlewares/fetchuser";
 
 const router = Router();
 const upload = multer({ dest: "uploads" });
@@ -16,6 +17,16 @@ const upload = multer({ dest: "uploads" });
 const { LINK_SECRET, PORT, RENDER_EXTERNAL_URL } = process.env;
 
 const url = RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+
+router.get("/all", csrf, fetchuser, async (req, res) => {
+  try {
+    const { id } = req;
+    const journals = await Journal.find({ user: id });
+    res.json({ success: true, journals });
+  } catch {
+    res.status(500).json({ success: false, error: "Something went wrong! Try again..." });
+  }
+});
 
 router.post("/add", csrf, upload.single("file"), checksize, async (req, res) => {
   const { body, file, id } = req;
@@ -32,13 +43,23 @@ router.post("/add", csrf, upload.single("file"), checksize, async (req, res) => 
     usePromises([journal.updateOne({ link: sign(link, LINK_SECRET) }), deleteFile(path)]);
   } catch {
     try {
-      res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
+      res.status(500).json({ success: false, error: "Something went wrong! Try again..." });
       deleteFile(file);
     } catch {}
   }
 });
 
-router.get("/download/:filename", async (req, res) => {
+router.get("/fetch/:id", csrf, fetchuser, async (req, res) => {
+  try {
+    const { params, id } = req;
+    const journal = await Journal.findOne({ _id: params.id, user: id });
+    res.json({ success: true, journal });
+  } catch {
+    res.status(500).json({ success: false, error: "Something went wrong! Try again..." });
+  }
+});
+
+router.get("/download/:filename", csrf, fetchuser, async (req, res) => {
   try {
     res.download(`uploads/${req.params.filename}`);
   } catch {
