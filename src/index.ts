@@ -12,13 +12,21 @@ app.use(cors({ origin: [CORS], maxAge: 600, methods: ["GET", "POST", "PUT", "DEL
 app.use(express.json());
 app.use(compression());
 
-app.get("/", (_, res) => {
-  res.send("Hello World!");
-});
+app.get("/", (_, res) => res.send("Hello World!"));
 app.use("/auth", authRouter);
 app.use("/journal", journalRouter);
 
 app.listen(PORT, () => {
   console.log(`Satyam Backend is running at ${PORT}`);
   mongoConnect();
+});
+
+process.on("uncaughtException", (err) => {
+  console.log("Uncaught exception:", err);
+  process.exitCode = 0;
+});
+
+process.on("unhandledRejection", (err) => {
+  console.log("Unhandled rejection:", err);
+  process.exitCode = 0;
 });
