@@ -19,6 +19,7 @@ declare global {
       GMAIL_PASS: string;
       MEGA_EMAIL: string;
       MEGA_PASSWORD: string;
+      RENDER_EXTERNAL_URL: string | undefined;
     }
   }
 }
