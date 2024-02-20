@@ -41,7 +41,7 @@ export function generateMessage({ id, name, email }: Partial<User>, type = "conf
       <p>Hello <input disabled style="margin:0;padding:0;color:black;background-color:transparent;border:none;min-width: 20rem;cursor:text" value='${name}!'>
       <br>
       Thanks for choosing Satyam - The cloud file sharing website! Click below to confirm your Satyam account (Valid only for next ${expiresIn}):</p>
-      <a href=${CORS}/account/confirm/${sign({ id }, EMAIL_SECRET!, { expiresIn })}>Confirm Account</a>
+      <a href=${CORS}/account/confirm/${sign({ id }, EMAIL_SECRET, { expiresIn })}>Confirm Account</a>
       <br>
       <p>Not You? No worries, just ignore this mail!</p>
       <br>

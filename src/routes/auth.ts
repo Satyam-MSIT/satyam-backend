@@ -44,7 +44,7 @@ router.post("/signup", async (req, res) => {
 
 router.put("/confirm", async (req, res) => {
   try {
-    const { id } = jwt.verify(req.headers.token as string, process.env.EMAIL_SECRET!) as { id: string };
+    const { id } = jwt.verify(req.headers.token as string, process.env.EMAIL_SECRET) as { id: string };
     try {
       const { confirmed } = (await User.findByIdAndUpdate(id, { confirmed: true }).select("confirmed"))!;
       res.json({ success: true, msg: confirmed ? "User already confirmed!" : "Satyam account successfully confirmed!" });
