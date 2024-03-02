@@ -20,7 +20,7 @@ const url = RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 
 router.use(fetchuser);
 
-router.get("/all", csrf, async (req, res) => {
+router.get("/all", async (req, res) => {
   try {
     const { id } = req;
     const journals = await Journal.find({ user: id });
@@ -30,7 +30,7 @@ router.get("/all", csrf, async (req, res) => {
   }
 });
 
-router.post("/add", csrf, upload.single("file"), checksize, async (req, res) => {
+router.post("/add", upload.single("file"), checksize, async (req, res) => {
   const { body, file, id } = req;
   try {
     const { title, description } = await addSchema.parseAsync(body);
@@ -51,7 +51,7 @@ router.post("/add", csrf, upload.single("file"), checksize, async (req, res) => 
   }
 });
 
-router.get("/fetch/:id", csrf, async (req, res) => {
+router.get("/fetch/:id", async (req, res) => {
   try {
     const { params, id } = req;
     const journal = await Journal.findOne({ _id: params.id, user: id });
@@ -61,7 +61,7 @@ router.get("/fetch/:id", csrf, async (req, res) => {
   }
 });
 
-router.get("/download/:filename", csrf, async (req, res) => {
+router.get("/download/:filename", async (req, res) => {
   try {
     res.download(`uploads/${req.params.filename}`);
   } catch {
