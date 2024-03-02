@@ -1,23 +1,46 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
 const journalSchema = new Schema(
   {
-    user: { type: Schema.Types.ObjectId, ref: "user" },
-    status: { type: String, default: "uploaded", enum: ["uploaded", "reviewing", "accepted"] },
     title: { type: String, required: true },
     description: String,
-    link: { type: String, required: true },
-    name: { type: String, required: true },
-    filename: { type: String, required: true },
-    size: { type: Number, required: true },
-    comments: [
-      {
-        status: { type: String, default: "", enum: [""] },
-        message: { type: String, required: true },
-        link: String,
-        time: { type: Date, default: Date.now },
-      },
-    ],
+    status: {
+      type: String,
+      default: "review-chief-editor",
+      enum: [
+        "accepted",
+        "accepted-minor", //accepted with minor changes
+        "accepted-major", //accepted with major changes
+        "rejected",
+        "under-review", // under review by the reviewer
+        "review-chief-editor", // just submitted to satyam team
+        "waiting-reviewer", //waiting for reviewer to allocated
+        "final",
+      ],
+    },
+    author_id: { type: Types.ObjectId, ref: "user", required: true },
+    author_name: { type: String, required: true },
+    author_reviewer: { type: [Types.ObjectId], default: [] },
+    versions: {
+      type: [
+        {
+          link: { type: String, required: true },
+          name: { type: String, required: true },
+          comments: {
+            type: [
+              {
+                email: String,
+                status: { type: String, required: true, enum: ["working", "accepted", "accepted-minor", "accepted-major", "rejected"] },
+                time: { type: Date, default: Date.now },
+                form: {},
+              },
+            ],
+            default: [{ status: "working" }],
+          },
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );

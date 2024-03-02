@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const types = ["admin", "author", "reviewer", "editor"] as const;
+export const types = ["satyam-admin", "satyam-chief-editor", "satyam-member", "reviewer", "author"] as const;
 
 export const otpSchema = z.object({ email: z.string().email() });
 

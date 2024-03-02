@@ -18,7 +18,9 @@ const { LINK_SECRET, PORT, RENDER_EXTERNAL_URL } = process.env;
 
 const url = RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 
-router.get("/all", csrf, fetchuser, async (req, res) => {
+router.use(fetchuser);
+
+router.get("/all", csrf, async (req, res) => {
   try {
     const { id } = req;
     const journals = await Journal.find({ user: id });
@@ -49,7 +51,7 @@ router.post("/add", csrf, upload.single("file"), checksize, async (req, res) => 
   }
 });
 
-router.get("/fetch/:id", csrf, fetchuser, async (req, res) => {
+router.get("/fetch/:id", csrf, async (req, res) => {
   try {
     const { params, id } = req;
     const journal = await Journal.findOne({ _id: params.id, user: id });
@@ -59,7 +61,7 @@ router.get("/fetch/:id", csrf, fetchuser, async (req, res) => {
   }
 });
 
-router.get("/download/:filename", csrf, fetchuser, async (req, res) => {
+router.get("/download/:filename", csrf, async (req, res) => {
   try {
     res.download(`uploads/${req.params.filename}`);
   } catch {

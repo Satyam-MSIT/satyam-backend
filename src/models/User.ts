@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Date, Schema, model } from "mongoose";
 import { types } from "../schemas/auth";
 
 export type User = {
@@ -7,6 +7,7 @@ export type User = {
   email: string;
   mobile: string;
   password: string;
+  lastPasswordModifiedAt: Date
   type: (typeof types)[number];
   confirmed: boolean;
 };
@@ -17,6 +18,7 @@ const userSchema = new Schema<User>(
     email: { type: String, required: true, unique: true, lowercase: true },
     mobile: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    lastPasswordModifiedAt: { type: Date, default: Date.now },
     type: { type: String, required: true, enum: types },
     confirmed: { type: Boolean, default: false },
   },
