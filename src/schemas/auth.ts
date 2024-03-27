@@ -9,7 +9,6 @@ export const loginSchema = otpSchema.extend({ password: z.string().min(8) });
 export const signupSchema = loginSchema.extend({
   fname: z.string().min(1).max(20),
   lname: z.string().min(1).max(20),
-  mobile: z.string().length(10),
   type: z.enum(types),
 });
 

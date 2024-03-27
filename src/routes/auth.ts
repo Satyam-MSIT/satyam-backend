@@ -15,7 +15,7 @@ const router = Router();
 
 router.post("/signup", async (req, res) => {
   try {
-    const { fname, lname, email, mobile, password, type } = await signupSchema.parseAsync(req.body);
+    const { fname, lname, email, password, type } = await signupSchema.parseAsync(req.body);
     User.prototype;
     let user = await User.findOne({ email });
     if (user?.confirmed) return res.status(400).json({ success: false, error: "Email already exists" });
@@ -25,10 +25,9 @@ router.post("/signup", async (req, res) => {
     await retryAsync(
       async () => {
         const name = `${fname} ${lname}`;
-        if (!user) user = await User.create({ name, email, mobile, password: secPass, type });
+        if (!user) user = await User.create({ name, email, password: secPass, type });
         else {
           user.name = name;
-          user.mobile = mobile;
           user.password = secPass;
           user.type = type;
           await user.save();

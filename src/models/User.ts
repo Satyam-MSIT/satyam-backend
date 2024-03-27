@@ -5,7 +5,6 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  mobile: string;
   password: string;
   lastPasswordModifiedAt: Date
   type: (typeof types)[number];
@@ -16,7 +15,6 @@ const userSchema = new Schema<User>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
-    mobile: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     lastPasswordModifiedAt: { type: Date, default: Date.now },
     type: { type: String, required: true, enum: types },
