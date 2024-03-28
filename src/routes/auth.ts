@@ -16,7 +16,6 @@ const router = Router();
 router.post("/signup", async (req, res) => {
   try {
     const { fname, lname, email, password, type } = await signupSchema.parseAsync(req.body);
-    User.prototype;
     let user = await User.findOne({ email });
     if (user?.confirmed) return res.status(400).json({ success: false, error: "Email already exists" });
     res.json({ success: true, msg: "Satyam account created successfully, please confirm your account via email to proceed!" });
@@ -62,7 +61,7 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ success: false, error: "Sorry! Invalid Credentials" });
 
-    const pwdCompare = await bcrypt.compare(password, user.password);
+    const pwdCompare = await bcrypt.compare(password, user.password as string);
     if (!pwdCompare) return res.status(400).json({ success: false, error: "Sorry! Invalid Credentials" });
 
     if (!user.confirmed) {

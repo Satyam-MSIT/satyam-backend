@@ -5,7 +5,6 @@ import { sign } from "jssign";
 import Journal from "../models/Journal";
 import checksize from "../middlewares/checksize";
 import { uploadMega } from "../modules/upload";
-import csrf from "../middlewares/csrf";
 import { usePromises } from "../modules/promise";
 import { deleteFile } from "../modules/file";
 import { addSchema } from "../schemas/journal";
