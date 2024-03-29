@@ -21,14 +21,14 @@ dependencies:
     specifier: ^9.0.2
     version: 9.0.2
   jssign:
-    specifier: ^0.3.2
-    version: 0.3.2
+    specifier: ^0.3.3
+    version: 0.3.3
   megajs:
     specifier: ^1.1.7
     version: 1.1.7
   mongoose:
-    specifier: ^8.2.3
-    version: 8.2.3
+    specifier: ^8.2.4
+    version: 8.2.4
   multer:
     specifier: 1.4.5-lts.1
     version: 1.4.5-lts.1
@@ -1065,8 +1065,8 @@ packages:
       semver: 7.6.0
     dev: false
 
-  /jssign@0.3.2:
-    resolution: {integrity: sha512-sobOCWfZCi/tLr+0Ye7BkYAmEeYXi7aB7gahxZKHmPsUqQsY5JNEMfzwrVqRsntzwaSepbLQzkqGgE4oBLMK9A==}
+  /jssign@0.3.3:
+    resolution: {integrity: sha512-6HL6/O40kcn+ndi4C4XDWOlArmqg688ihLTDMFlC/eGd8X3TZurdLOJ4dIn+TxTy5fy9PkBYEHadcj6kJu6WYw==}
     dependencies:
       sjcl: 1.0.8
     dev: false
@@ -1263,8 +1263,8 @@ packages:
       mongodb-connection-string-url: 3.0.0
     dev: false
 
-  /mongoose@8.2.3:
-    resolution: {integrity: sha512-ZB8K8AgbVgLCcqjtmZMxaQBEztwEEZCtAIPMx2Q56Uo4WWKmwf5Nu/EEIFo8d/17P946X0z6xzxwIqCxUMKxrA==}
+  /mongoose@8.2.4:
+    resolution: {integrity: sha512-da/r6zpG+2eAXuhBGUnL6jcBd03zlytoCc5/wq+LyTsmrY9hhPQmSpnugwnfqldtBmUOhB6iMLoV4hNtHRq+ww==}
     engines: {node: '>=16.20.1'}
     dependencies:
       bson: 6.3.0

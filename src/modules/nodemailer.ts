@@ -2,7 +2,6 @@ import { createTransport } from "nodemailer";
 import { sign } from "jsonwebtoken";
 import { retryAsync } from "utility-kit";
 import { expiresIn } from "../constants";
-import { User } from "../models/User";
 
 // type User = {
 //   id?: string;
@@ -25,7 +24,7 @@ const transporter = createTransport({
   tls: { requestCert: true, rejectUnauthorized: true },
 });
 
-export function generateMessage({ id, name, email }: Partial<User>, type = "confirm", otp?: string) {
+export function generateMessage({ id, name, email }: any, type = "confirm", otp?: string) {
   const message: Message = { from: "Satyamwebsite@gmail.com", to: email! };
   if (type === "otp") {
     message.subject = "OTP for your Satyam account";
