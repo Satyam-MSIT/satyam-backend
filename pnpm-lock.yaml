@@ -21,8 +21,8 @@ dependencies:
     specifier: ^9.0.2
     version: 9.0.2
   jssign:
-    specifier: ^0.3.3
-    version: 0.3.3
+    specifier: ^0.3.2
+    version: 0.3.2
   megajs:
     specifier: ^1.1.7
     version: 1.1.7
@@ -40,7 +40,7 @@ dependencies:
     version: 6.9.13
   utility-kit:
     specifier: ^0.3.5
-    version: 0.3.5
+    version: 0.3.6
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -1065,8 +1065,8 @@ packages:
       semver: 7.6.0
     dev: false
 
-  /jssign@0.3.3:
-    resolution: {integrity: sha512-6HL6/O40kcn+ndi4C4XDWOlArmqg688ihLTDMFlC/eGd8X3TZurdLOJ4dIn+TxTy5fy9PkBYEHadcj6kJu6WYw==}
+  /jssign@0.3.2:
+    resolution: {integrity: sha512-sobOCWfZCi/tLr+0Ye7BkYAmEeYXi7aB7gahxZKHmPsUqQsY5JNEMfzwrVqRsntzwaSepbLQzkqGgE4oBLMK9A==}
     dependencies:
       sjcl: 1.0.8
     dev: false
@@ -1720,8 +1720,8 @@ packages:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
     dev: false
 
-  /utility-kit@0.3.5:
-    resolution: {integrity: sha512-DpIP2EzUWMSUgggQk4gXynXl/xT+CV4ujfuNQyWst4Cq5bQtl3LzhQSu4gxxuFa1ftA6oFAEt1eSA0Nw7/OHTg==}
+  /utility-kit@0.3.6:
+    resolution: {integrity: sha512-vVhnjPipEpsMuw2VtjXnSKrKx6ud1Zm4BQ/iqGtnv1QDe6rXWEpdzmAoFiYjtKpTT7FqTVGbdH7Ey846god8fg==}
     dev: false
 
   /utils-merge@1.0.1:

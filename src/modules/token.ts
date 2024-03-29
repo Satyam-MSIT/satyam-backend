@@ -1,6 +1,6 @@
 import { IncomingHttpHeaders } from "http";
 import jwt from "jsonwebtoken";
-import jss from "jssign";
+import * as jss from "jssign";
 
 const { AUTH_SECRET, ENCODE_SECRET } = process.env;
 
