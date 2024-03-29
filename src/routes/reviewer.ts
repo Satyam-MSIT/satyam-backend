@@ -1,7 +1,6 @@
 import { Router } from "express";
 import fetchuser from "../middlewares/fetchuser";
 import User from "../models/User";
-import { journalSchema } from "../models/Journal";
 
 const router = Router();
 

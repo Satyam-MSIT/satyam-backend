@@ -15,7 +15,7 @@ const router = Router();
 
 router.post("/signup", async (req, res) => {
   try {
-    const { fname, lname, email, password, type } = await signupSchema.parseAsync(req.body);
+    const { name, email, password, type, alternateEmail } = await signupSchema.parseAsync(req.body);
     let user = await User.findOne({ email });
     if (user?.confirmed) return res.status(400).json({ success: false, error: "Email already exists" });
     res.json({ success: true, msg: "Satyam account created successfully, please confirm your account via email to proceed!" });
@@ -23,12 +23,11 @@ router.post("/signup", async (req, res) => {
     const secPass = await bcrypt.hash(password, 10);
     await retryAsync(
       async () => {
-        const name = `${fname} ${lname}`;
-        if (!user) user = await User.create({ name, email, password: secPass, type });
+        if (!user) user = await User.create({ name, email, password: secPass, type, alternateEmail });
         else {
           user.name = name;
           user.password = secPass;
-          user.type = type;
+          if (type) user.type = type;
           await user.save();
         }
       },
@@ -69,7 +68,7 @@ router.post("/login", async (req, res) => {
       return sendMail(generateMessage(user));
     }
 
-    const token = generateToken({ id: user.id, dimensions: headers.dimensions, origin: headers.origin, userAgent: sanitizeUserAgent(headers["user-agent"]!) });
+    const token = generateToken({ id: user.id, dimensions: headers.dimensions, origin: headers.origin, userAgent: sanitizeUserAgent(headers["user-agent"]!), tokenCreatedAt: Date.now() });
     res.json({ success: true, name: user.name, msg: "Logged in successfully!", type: user.type, token });
   } catch {
     res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
@@ -112,8 +111,9 @@ router.put("/forgot", async (req, res) => {
     if (!user) return res.status(404).json({ success: false, error: "Sorry! No user found with this email." });
 
     const secPass = await bcrypt.hash(password, 10);
-    await User.findOneAndUpdate({ email }, { password: secPass, confirmed: true });
+    await User.findOneAndUpdate({ email }, { password: secPass, lastPasswordModifiedAt: Date.now(), confirmed: true });
     removeStorage(email!);
+    removeStorage(`user-${user._id}`);
     res.json({ success: true, msg: "Password reset successful!" });
   } catch {
     res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });

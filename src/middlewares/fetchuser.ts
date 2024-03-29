@@ -6,12 +6,16 @@ import { verifyToken } from "../modules/token";
 
 const fetchuser: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = verifyToken(req.headers)!;
-    if (!getStorage(`user-${id}`)) {
-      if (await User.exists({ _id: id })) setStorage(`user-${id}`, true);
+    const { id, tokenCreatedAt } = verifyToken(req.headers)!;
+    let user: any = getStorage(`user-${id}`);
+    if (!user) {
+      user = await User.findById(id);
+      if (user) setStorage(`user-${id}`, user);
       else return authenticationError(res);
     }
+    if (user.lastPasswordModifiedAt > tokenCreatedAt) return authenticationError(res);
     req.id = id;
+    req.user = user;
     next();
   } catch {
     authenticationError(res);

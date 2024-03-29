@@ -21,9 +21,9 @@ export function generateToken(data: any) {
 
 export function verifyToken(data: IncomingHttpHeaders & { token?: string; dimensions?: number }) {
   const encoded = jwt.verify(data.token!, AUTH_SECRET!);
-  const { id, dimensions, origin, userAgent } = jss.verify(encoded as string, ENCODE_SECRET!);
+  const { id, dimensions, origin, userAgent, tokenCreatedAt } = jss.verify(encoded as string, ENCODE_SECRET!);
   if (dimensions !== data.dimensions) return;
   if (origin !== data.origin) return;
   if (userAgent !== sanitizeUserAgent(data["user-agent"]!)) return;
-  return { id } as { id: string };
+  return { id, tokenCreatedAt } as { id: string; tokenCreatedAt: number };
 }
