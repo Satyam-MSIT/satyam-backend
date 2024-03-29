@@ -39,8 +39,8 @@ dependencies:
     specifier: ^6.9.13
     version: 6.9.13
   utility-kit:
-    specifier: ^0.3.5
-    version: 0.3.6
+    specifier: ^0.3.7
+    version: 0.3.7
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -1720,8 +1720,8 @@ packages:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
     dev: false
 
-  /utility-kit@0.3.6:
-    resolution: {integrity: sha512-vVhnjPipEpsMuw2VtjXnSKrKx6ud1Zm4BQ/iqGtnv1QDe6rXWEpdzmAoFiYjtKpTT7FqTVGbdH7Ey846god8fg==}
+  /utility-kit@0.3.7:
+    resolution: {integrity: sha512-c0XA8+uyYSGYhQQcxN0eerDJ3K1qDWNqxW9i1A7Nf0UuIfzd+gcRmtAnQN7Dc4oAV6IVJnHlzbNJ6eSppaLosw==}
     dev: false
 
   /utils-merge@1.0.1:
