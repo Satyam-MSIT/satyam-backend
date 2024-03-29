@@ -70,8 +70,8 @@ router.post("/login", async (req, res) => {
 
     const token = generateToken({ id: user.id, dimensions: headers.dimensions, origin: headers.origin, userAgent: sanitizeUserAgent(headers["user-agent"]!), tokenCreatedAt: Date.now() });
     res.json({ success: true, name: user.name, msg: "Logged in successfully!", type: user.type, token });
-  } catch {
-    res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
   }
 });
 
