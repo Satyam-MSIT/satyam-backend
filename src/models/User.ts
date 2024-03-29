@@ -20,7 +20,7 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true, lowercase: true },
     alternateEmail: { type: String, lowercase: true },
     password: { type: String, required: true },
-    lastPasswordModifiedAt: { type: Date, default: Date.now },
+    lastPasswordModifiedAt: { type: Number, default: Date.now },
     type: { type: String, default: "author", enum: types },
     confirmed: { type: Boolean, default: false },
     journal_ids: [{ type: [Types.ObjectId], default: [], ref: "journal" }],
