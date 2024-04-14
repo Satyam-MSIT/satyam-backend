@@ -8,6 +8,8 @@ import journalRouter from "./routes/journal";
 const app = express();
 const { CORS, PORT } = process.env;
 
+app.enable("trust proxy");
+
 app.get("/", (_, res) => res.send("Satyam backend is running!"));
 
 app.use(cors({ origin: CORS, maxAge: 600, methods: ["GET", "POST", "PUT", "DELETE"] }));
