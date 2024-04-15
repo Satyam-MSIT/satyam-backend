@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { InferSchemaType, Schema, model } from "mongoose";
 
 const contactSchema = new Schema({
   name: { type: String, required: true },
@@ -7,3 +7,5 @@ const contactSchema = new Schema({
 });
 
 export default model("contact", contactSchema);
+
+export type ContactType = InferSchemaType<typeof contactSchema>;

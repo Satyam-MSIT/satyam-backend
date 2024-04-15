@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { InferSchemaType, Schema, model } from "mongoose";
 
 const newsletterSchema = new Schema(
   {
@@ -8,3 +8,5 @@ const newsletterSchema = new Schema(
 );
 
 export default model("newsletter", newsletterSchema);
+
+export type NewsletterType = InferSchemaType<typeof newsletterSchema>;

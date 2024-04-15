@@ -8,8 +8,10 @@ export const loginSchema = otpSchema.extend({ password: z.string().min(8) });
 
 export const signupSchema = loginSchema.extend({
   name: z.string().min(1).max(50),
-  type: z.enum(types).optional(),
-  alternateEmail: z.string().email().optional()
+  type: z.enum(types),
+  alternateEmail: z.string().email().optional(),
 });
 
 export const forgotSchema = loginSchema.extend({ otp: z.string().length(6) });
+
+export type SignupData = z.infer<typeof signupSchema>;

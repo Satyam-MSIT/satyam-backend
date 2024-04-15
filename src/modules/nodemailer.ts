@@ -2,6 +2,7 @@ import { createTransport } from "nodemailer";
 import { sign } from "jsonwebtoken";
 import { retryAsync } from "utility-kit";
 import { expiresIn } from "../constants";
+import { UserType } from "../models/User";
 
 // type User = {
 //   id?: string;
@@ -24,7 +25,7 @@ const transporter = createTransport({
   tls: { requestCert: true, rejectUnauthorized: true },
 });
 
-export function generateMessage({ id, name, email }: any, type = "confirm", otp?: string) {
+export function generateMessage({ _id, name, email }: Partial<UserType>, type = "confirm", otp?: string) {
   const message: Message = { from: "Satyamwebsite@gmail.com", to: email! };
   if (type === "otp") {
     message.subject = "OTP for your Satyam account";
@@ -40,7 +41,7 @@ export function generateMessage({ id, name, email }: any, type = "confirm", otp?
       <p>Hello <input disabled style="margin:0;padding:0;color:black;background-color:transparent;border:none;min-width: 20rem;cursor:text" value='${name}!'>
       <br>
       Thanks for choosing Satyam - The cloud file sharing website! Click below to confirm your Satyam account (Valid only for next ${expiresIn}):</p>
-      <a href=${CORS}/account/confirm/${sign({ id }, EMAIL_SECRET, { expiresIn })}>Confirm Account</a>
+      <a href=${CORS}/auth/verify?token=${sign({ id: _id }, EMAIL_SECRET, { expiresIn })}>Confirm Account</a>
       <br>
       <p>Not You? No worries, just ignore this mail!</p>
       <br>

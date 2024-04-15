@@ -4,18 +4,19 @@ import jwt from "jsonwebtoken";
 import { generateOTP, retryAsync } from "utility-kit";
 
 import fetchuser from "../middlewares/fetchuser";
+import verifyAdmin from "../middlewares/verifyadmin";
 import User from "../models/User";
 import { otpExpiry } from "../constants";
 import { generateMessage, sendMail } from "../modules/nodemailer";
 import { getStorage, removeStorage, setStorage } from "../modules/storage";
 import { generateToken, sanitizeUserAgent } from "../modules/token";
-import { signupSchema, forgotSchema, loginSchema, otpSchema } from "../schemas/auth";
+import { forgotSchema, loginSchema, otpSchema } from "../schemas/auth";
 
 const router = Router();
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", fetchuser(false), verifyAdmin, async (req, res) => {
   try {
-    const { name, email, password, type, alternateEmail } = await signupSchema.parseAsync(req.body);
+    const { name, email, password, type, alternateEmail } = req.data!;
     let user = await User.findOne({ email });
     if (user?.confirmed) return res.status(400).json({ success: false, error: "Email already exists" });
     res.json({ success: true, msg: "Satyam account created successfully, please confirm your account via email to proceed!" });
@@ -75,7 +76,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.delete("/delete", fetchuser, async (req, res) => {
+router.delete("/delete", fetchuser(), async (req, res) => {
   try {
     const { id } = req;
     await User.findByIdAndDelete(id);
@@ -120,7 +121,7 @@ router.put("/forgot", async (req, res) => {
   }
 });
 
-router.get("/protect", fetchuser, async (req, res) => {
+router.get("/protect", fetchuser(), async (req, res) => {
   try {
     res.json({ success: true, user: req.user });
   } catch {

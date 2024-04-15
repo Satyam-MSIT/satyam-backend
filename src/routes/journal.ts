@@ -17,7 +17,7 @@ const { LINK_SECRET, PORT, RENDER_EXTERNAL_URL } = process.env;
 
 const url = RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 
-router.use(fetchuser);
+router.use(fetchuser());
 
 router.get("/all", async (req, res) => {
   try {

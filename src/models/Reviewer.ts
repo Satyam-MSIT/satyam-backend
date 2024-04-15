@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { InferSchemaType, Schema, model } from "mongoose";
 
 export const reviewerSchema = new Schema(
   {
@@ -20,3 +20,5 @@ export const reviewerSchema = new Schema(
 // });
 
 export default model("reviewer", reviewerSchema);
+
+export type ReviewerType = InferSchemaType<typeof reviewerSchema>;

@@ -1,25 +1,22 @@
 import { RequestHandler } from "express";
-import User from "../models/User";
+import User, { UserType } from "../models/User";
 import { authenticationError } from "../modules/account";
-import { getStorage, setStorage } from "../modules/storage";
+import { getStorageAsync, setStorage } from "../modules/storage";
 import { verifyToken } from "../modules/token";
 
-const fetchuser: RequestHandler = async (req, res, next) => {
-  try {
-    const { id, tokenCreatedAt } = verifyToken(req.headers)!;
-    let user: any = getStorage(`user-${id}`);
-    if (!user) {
-      user = await User.findById(id).select("name email type confirmed lastPasswordModifiedAt");
-      if (user) setStorage(`user-${id}`, user);
-      else return authenticationError(res);
+export default function fetchuser(strict = true): RequestHandler {
+  return async (req, res, next) => {
+    try {
+      const { id, tokenCreatedAt } = verifyToken(req.headers)!;
+      let user: UserType = await getStorageAsync(`user-${id}`, async () => await User.findById(id).select("name email type confirmed lastPasswordModifiedAt"));
+      if (!user) throw new Error("User not found");
+      if (user.lastPasswordModifiedAt > tokenCreatedAt) throw new Error("Session expired");
+      req.id = id;
+      req.user = user;
+      next();
+    } catch {
+      if (strict) authenticationError(res);
+      else next();
     }
-    if (user.lastPasswordModifiedAt > tokenCreatedAt) return authenticationError(res);
-    req.id = id;
-    req.user = user;
-    next();
-  } catch {
-    authenticationError(res);
-  }
-};
-
-export default fetchuser;
+  };
+}

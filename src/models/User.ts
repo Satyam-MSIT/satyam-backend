@@ -1,21 +1,10 @@
-import { Schema, Types, model } from "mongoose";
+import { InferSchemaType, Schema, Types, model } from "mongoose";
 import { types } from "../schemas/auth";
 import { reviewerSchema } from "./Reviewer";
 
-// export type User = {
-//   id: string;
-//   name: string;
-//   email: string;
-//   password: string;
-//   lastPasswordModifiedAt: Date;
-//   type: (typeof types)[number];
-//   confirmed: boolean;
-//   // author_id?: ObjectId;
-//   reviewer_id?: ObjectId;
-// };
-
 const userSchema = new Schema(
   {
+    _id: Types.ObjectId,
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     alternateEmail: { type: String, lowercase: true },
@@ -32,3 +21,5 @@ const userSchema = new Schema(
 );
 
 export default model("user", userSchema);
+
+export type UserType = InferSchemaType<typeof userSchema>;

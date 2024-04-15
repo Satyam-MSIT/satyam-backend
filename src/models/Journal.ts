@@ -1,4 +1,4 @@
-import { Schema, Types, model } from "mongoose";
+import { InferSchemaType, Schema, Types, model } from "mongoose";
 
 export const journalSchema = new Schema(
   {
@@ -61,3 +61,5 @@ export const journalSchema = new Schema(
 );
 
 export default model("journal", journalSchema);
+
+export type JournalType = InferSchemaType<typeof journalSchema>;
