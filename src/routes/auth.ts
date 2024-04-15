@@ -69,7 +69,7 @@ router.post("/login", async (req, res) => {
     }
 
     const token = generateToken({ id: user.id, dimensions: headers.dimensions, origin: headers.origin, userAgent: sanitizeUserAgent(headers["user-agent"]!), tokenCreatedAt: Date.now() });
-    res.json({ success: true, name: user.name, msg: "Logged in successfully!", type: user.type, token });
+    res.json({ success: true, msg: "Logged in successfully!", name: user.name, type: user.type, token });
   } catch (error) {
     res.status(500).json({ success: false, error: (error as Error).message });
   }
@@ -115,6 +115,14 @@ router.put("/forgot", async (req, res) => {
     removeStorage(email!);
     removeStorage(`user-${user._id}`);
     res.json({ success: true, msg: "Password reset successful!" });
+  } catch {
+    res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
+  }
+});
+
+router.get("/protect", fetchuser, async (req, res) => {
+  try {
+    res.json({ success: true, user: req.user });
   } catch {
     res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
   }

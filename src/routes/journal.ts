@@ -37,7 +37,7 @@ router.post("/add", upload.single("file"), checksize, async (req, res) => {
 
     let link = sign(`${url}/file/download/${filename}`, LINK_SECRET);
     const journal = await Journal.create({ user: id, title, description, link, name: originalname, filename, size });
-    res.json({ success: true, id: journal._id, name: originalname, msg: "Journal uploaded successfully!" });
+    res.json({ success: true, msg: "Journal uploaded successfully!", id: journal._id, name: originalname });
     do {
       link = await uploadMega(filename, path, size);
     } while (!link);

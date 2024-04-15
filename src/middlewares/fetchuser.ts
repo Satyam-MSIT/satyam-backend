@@ -9,7 +9,7 @@ const fetchuser: RequestHandler = async (req, res, next) => {
     const { id, tokenCreatedAt } = verifyToken(req.headers)!;
     let user: any = getStorage(`user-${id}`);
     if (!user) {
-      user = await User.findById(id);
+      user = await User.findById(id).select("name email type confirmed lastPasswordModifiedAt");
       if (user) setStorage(`user-${id}`, user);
       else return authenticationError(res);
     }
