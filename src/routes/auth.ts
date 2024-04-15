@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { generateOTP, retryAsync } from "utility-kit";
 
 import fetchuser from "../middlewares/fetchuser";
-import verifyAdmin from "../middlewares/verifyadmin";
+import verifyAdmin from "../middlewares/verifyAdmin";
 import User from "../models/User";
 import { otpExpiry } from "../constants";
 import { generateMessage, sendMail } from "../modules/nodemailer";
