@@ -6,7 +6,7 @@ import authRouter from "./routes/auth";
 import journalRouter from "./routes/journal";
 
 const app = express();
-const { CORS, PORT } = process.env;
+const { PORT } = process.env;
 
 app.enable("trust proxy");
 
