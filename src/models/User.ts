@@ -4,7 +4,6 @@ import { reviewerSchema } from "./Reviewer";
 
 const userSchema = new Schema(
   {
-    _id: Types.ObjectId,
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     alternateEmail: { type: String, lowercase: true },
@@ -22,4 +21,4 @@ const userSchema = new Schema(
 
 export default model("user", userSchema);
 
-export type UserType = InferSchemaType<typeof userSchema>;
+export type UserType = { id?: string } & InferSchemaType<typeof userSchema>;
