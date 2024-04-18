@@ -54,6 +54,17 @@ router.put("/confirm", async (req, res) => {
   }
 });
 
+router.get("/confirm/reset", async (req, res) => {
+  try {
+    const { id } = jwt.verify(req.headers.token as string, process.env.EMAIL_SECRET, { ignoreExpiration: true }) as { id: string };
+    const user = await User.findById(id);
+    sendMail(generateMessage(user!));
+    res.json({ success: true });
+  } catch {
+    res.status(400).json({ success: false, error: "Bad request" });
+  }
+});
+
 router.post("/login", async (req, res) => {
   try {
     const { body, headers } = req;
