@@ -2,13 +2,13 @@ import { Router } from "express";
 import multer from "multer";
 import { sign } from "jssign";
 
-import Journal from "../models/Journal";
+import Journal, { JournalType } from "../models/Journal";
 import checksize from "../middlewares/checksize";
-import { uploadMega } from "../modules/upload";
-import { usePromises } from "../modules/promise";
+import { deleteMega, uploadMega } from "../modules/upload";
 import { deleteFile } from "../modules/file";
 import fetchuser from "../middlewares/fetchuser";
-import { draftSchema } from "../schemas/journal";
+import { draftSchema, submitSchema } from "../schemas/journal";
+import { currentVolume, currentYear } from "../constants";
 
 const router = Router();
 const upload = multer({ dest: "uploads" });
@@ -30,47 +30,91 @@ router.get("/all", async (req, res) => {
 });
 
 router.post("/draft", upload.single("pdf"), checksize, async (req, res) => {
-  const { body, file, id } = req;
+  const { body, file, id, user } = req;
   try {
-    const { journal_id, title, abstract, keywords, reviewers } = await draftSchema.parseAsync(body);
-    const { originalname, filename, path, size } = file!;
+    const { journal_id, title, abstract, uploadFile, keywords, reviewers } = await draftSchema.parseAsync(body);
+    if (uploadFile === "new") {
+      var { originalname, filename, path, size } = file!;
+      var link = sign(await uploadMega(filename, path, size), LINK_SECRET);
+    }
 
-    let link = sign(`${url}/file/download/${filename}`, LINK_SECRET);
     let journal = await Journal.findOne({ journal_id });
-    if (!journal) journal = await Journal.create({ user: id, title, abstract, keywords, link, name: originalname, filename, size });
-    res.json({ success: true, msg: "Journal uploaded successfully!", id: journal._id, name: originalname });
-    do {
-      link = await uploadMega(filename, path, size);
-    } while (!link);
-    usePromises([journal.updateOne({ link: sign(link, LINK_SECRET) }), deleteFile(path)]);
+    if (!journal) {
+      journal = await Journal.create({
+        journal_id: "Draft" + Date.now(),
+        author_id: id,
+        author_name: user!.name,
+        title,
+        abstract,
+        keywords,
+        reviewers,
+        versions: uploadFile ? [{ link: link!, name: originalname!, filename: filename! }] : [],
+      });
+    } else {
+      const updatedJournal: Partial<JournalType> = {};
+      updatedJournal.title = title;
+      updatedJournal.abstract = abstract;
+      updatedJournal.keywords = keywords;
+      updatedJournal.reviewers = reviewers as any;
+      if (uploadFile !== "keep") {
+        const file = journal.versions[0];
+        if (file) await deleteMega(file.name);
+        if (uploadFile === "new") updatedJournal.versions = [{ link: link!, name: originalname!, filename: filename! }] as any;
+      }
+      await journal.updateOne(updatedJournal);
+    }
+    if (uploadFile === "new") await deleteFile(path!);
+    res.json({ success: true, msg: "Journal saved successfully!", journal_id: journal.journal_id });
   } catch {
+    res.status(500).json({ success: false, error: "Something went wrong! Try again..." });
     try {
-      res.status(500).json({ success: false, error: "Something went wrong! Try again..." });
       deleteFile(file);
     } catch {}
   }
 });
 
-// router.post("/submit", upload.single("file"), checksize, async (req, res) => {
-//   const { body, file, id } = req;
-//   try {
-//     const { title, description } = await addSchema.parseAsync(body);
-//     const { originalname, filename, path, size } = file!;
+router.post("/submit", upload.single("pdf"), checksize, async (req, res) => {
+  const { body, file, id, user } = req;
+  try {
+    const { journal_id, title, abstract, keywords, reviewers } = await submitSchema.parseAsync(body);
+    const { originalname, filename, path, size } = file!;
+    const link = sign(await uploadMega(filename, path, size), LINK_SECRET);
 
-//     let link = sign(`${url}/file/download/${filename}`, LINK_SECRET);
-//     const journal = await Journal.create({ user: id, title, description, link, name: originalname, filename, size });
-//     res.json({ success: true, msg: "Journal uploaded successfully!", id: journal._id, name: originalname });
-//     do {
-//       link = await uploadMega(filename, path, size);
-//     } while (!link);
-//     usePromises([journal.updateOne({ link: sign(link, LINK_SECRET) }), deleteFile(path)]);
-//   } catch {
-//     try {
-//       res.status(500).json({ success: false, error: "Something went wrong! Try again..." });
-//       deleteFile(file);
-//     } catch {}
-//   }
-// });
+    let journal = await Journal.findOne({ journal_id });
+    const count = await Journal.countDocuments({ journal_id: { $regex: `^${currentYear}${currentVolume}` } });
+    const newJournalId = currentYear + currentVolume + count;
+    if (!journal) {
+      journal = await Journal.create({
+        journal_id: newJournalId,
+        author_id: id,
+        author_name: user!.name,
+        title,
+        abstract,
+        keywords,
+        reviewers,
+        versions: [{ link: link!, name: originalname!, filename: filename! }],
+      });
+    } else {
+      const updatedJournal: Partial<JournalType> = {};
+      updatedJournal.journal_id = newJournalId;
+      updatedJournal.title = title;
+      updatedJournal.abstract = abstract;
+      updatedJournal.keywords = keywords;
+      updatedJournal.reviewers = reviewers as any;
+      const file = journal.versions[0];
+      if (file) await deleteFile(file.name);
+      updatedJournal.versions = [{ link: link!, name: originalname!, filename: filename! }] as any;
+      await journal.updateOne(updatedJournal);
+    }
+    await deleteFile(path!);
+    res.json({ success: true, msg: "Journal submitted successfully!", journal_id: journal.journal_id });
+  } catch {
+    res.status(500).json({ success: false, error: "Something went wrong! Try again..." });
+    try {
+      deleteFile(file);
+    } catch {}
+  }
+});
 
 router.get("/fetch/:id", async (req, res) => {
   try {

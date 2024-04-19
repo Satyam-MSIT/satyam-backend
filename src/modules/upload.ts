@@ -27,3 +27,16 @@ export async function uploadMega(name: string, path: string, size: number) {
     return "";
   }
 }
+
+export async function deleteMega(filename: string) {
+  try {
+    const { children = [] } = mega.root;
+    for (let i = 0; i < children.length; i++) {
+      const file = children[i]!;
+      if (file.name === filename) {
+        await file.delete(true);
+        break;
+      }
+    }
+  } catch {}
+}

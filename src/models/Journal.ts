@@ -33,6 +33,7 @@ export const journalSchema = new Schema(
     reviewers: {
       type: [
         {
+          name: { type: String },
           email: { type: String },
           status: { type: String, default: "pending", enum: ["accepted", "rejected", "pending"] },
         },
@@ -43,6 +44,7 @@ export const journalSchema = new Schema(
         {
           link: { type: String, required: true },
           name: { type: String, required: true },
+          filename: { type: String, required: true },
           comments: {
             type: [
               {
