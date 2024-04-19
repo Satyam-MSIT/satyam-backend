@@ -102,7 +102,7 @@ router.post("/submit", upload.single("pdf"), checksize, async (req, res) => {
       updatedJournal.keywords = keywords;
       updatedJournal.reviewers = reviewers as any;
       const file = journal.versions[0];
-      if (file) await deleteFile(file.name);
+      if (file) await deleteMega(file.name);
       updatedJournal.versions = [{ link: link!, name: originalname!, filename: filename! }] as any;
       await journal.updateOne(updatedJournal);
     }
