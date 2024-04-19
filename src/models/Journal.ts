@@ -4,8 +4,8 @@ export const journalSchema = new Schema(
   {
     journal_id: { type: String, required: true, unique: true },
     resubmission_id: { type: String },
-    title: { type: String, required: true },
-    description: String,
+    title: { type: String },
+    abstract: { type: String },
     status: {
       type: String,
       default: "review-chief-editor",
@@ -20,9 +20,9 @@ export const journalSchema = new Schema(
         "final",
       ],
     },
-    keywords: [{ type: String }],
-    author_id: { type: Types.ObjectId, ref: "user", required: true },
-    author_name: { type: String, required: true },
+    keywords: { type: [String] },
+    author_id: { type: Types.ObjectId, ref: "user" },
+    author_name: { type: String },
     author_reviewers: {
       type: [String],
       default: [],
@@ -30,12 +30,14 @@ export const journalSchema = new Schema(
         validator: (value: string[]) => value.length >= 3,
       },
     },
-    reviewers: [
-      {
-        email: { type: String, required: true },
-        status: { type: String, default: "pending", enum: ["accepted", "rejected", "pending"] },
-      },
-    ],
+    reviewers: {
+      type: [
+        {
+          email: { type: String },
+          status: { type: String, default: "pending", enum: ["accepted", "rejected", "pending"] },
+        },
+      ],
+    },
     versions: {
       type: [
         {
