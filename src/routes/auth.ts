@@ -43,7 +43,7 @@ router.post(
       );
       sendMail(generateMessage(user!, "confirm"));
       try {
-        if (!type.startsWith("satyam")) Newsletter.create({ name, email });
+        if (!type.startsWith("satyam")) await Newsletter.create({ name, email });
       } catch {}
     } catch {
       res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });

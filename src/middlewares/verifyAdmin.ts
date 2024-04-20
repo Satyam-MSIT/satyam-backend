@@ -8,7 +8,7 @@ export default function verifyAdmin(authCondition?: ConditionFunction): RequestH
   return async (req, res, next) => {
     try {
       req.data = await signupSchema.parseAsync(req.body);
-      if (req.user!.type === "satyam-admin" || authCondition?.(req)) next();
+      if (req.user?.type === "satyam-admin" || authCondition?.(req)) return next();
       authenticationError(res);
     } catch {
       authenticationError(res);

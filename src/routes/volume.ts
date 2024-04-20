@@ -10,7 +10,7 @@ import { generateMessage, sendMail } from "../modules/nodemailer";
 
 const router = Router();
 
-router.get("/all", async (req, res) => {
+router.get("/all", async (_, res) => {
   try {
     const volumes = await Volume.find();
     res.json({ success: true, volumes });

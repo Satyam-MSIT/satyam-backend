@@ -1,7 +1,7 @@
 import Volume, { VolumeType } from "../models/Volume";
 
 export async function getLatestVolume(): Promise<Partial<VolumeType>> {
-  return (await Volume.findOne().sort("-number")) || { number: 11 };
+  return (await Volume.findOne().sort("-number"))!;
 }
 
 export function getYear(date?: Date) {
