@@ -19,7 +19,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
-router.get("/latest", async (req, res) => {
+router.get("/latest", async (_, res) => {
   try {
     const { number, title, description, keywords } = (await Volume.findOne().sort("-number"))!;
     const journals = await Journal.find({ journal_id: { $regex: `^\d{2}${number}` } });
@@ -40,8 +40,7 @@ router.post("/call", async (req, res) => {
     const newsletters = await Newsletter.find();
     await usePromises(newsletters.map((user) => sendMail(generateMessage(user, "call"))));
     res.json({ success: true, msg: "Call for papers created successfully!" });
-  } catch (e) {
-    console.log(e);
+  } catch {
     res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
   }
 });

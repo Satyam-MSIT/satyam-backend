@@ -2,7 +2,7 @@ import { InferSchemaType, Schema, model } from "mongoose";
 
 const volumeSchema = new Schema(
   {
-    number: { type: Number, required: true, min: 1, max: 99 },
+    number: { type: Number, required: true, unique: true, min: 1, max: 99 },
     title: { type: String, required: true, unique: true },
     description: { type: String, required: true },
     keywords: { type: [String], required: true },
