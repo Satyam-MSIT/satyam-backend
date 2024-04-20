@@ -1,14 +1,17 @@
-import { RequestHandler } from "express";
+import { Request, RequestHandler } from "express";
 import { signupSchema } from "../schemas/auth";
+import { authenticationError } from "../modules/account";
 
-const verifyAdmin: RequestHandler = async (req, res, next) => {
-  try {
-    req.data = await signupSchema.parseAsync(req.body);
-    if (req.data.type.startsWith("satyam") && req.user!.type !== "satyam-admin") throw new Error("Bad request");
-    next();
-  } catch {
-    res.status(400).json({ success: false, error: "Bad request" });
-  }
-};
+type ConditionFunction = (req: Request) => boolean;
 
-export default verifyAdmin;
+export default function verifyAdmin(authCondition?: ConditionFunction): RequestHandler {
+  return async (req, res, next) => {
+    try {
+      req.data = await signupSchema.parseAsync(req.body);
+      if (req.user!.type === "satyam-admin" || authCondition?.(req)) next();
+      authenticationError(res);
+    } catch {
+      authenticationError(res);
+    }
+  };
+}

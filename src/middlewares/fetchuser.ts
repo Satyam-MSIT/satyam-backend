@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import User, { UserType } from "../models/User";
 import { authenticationError } from "../modules/account";
-import { getStorageAsync, setStorage } from "../modules/storage";
+import { getStorageAsync } from "../modules/storage";
 import { verifyToken } from "../modules/token";
 
 export default function fetchuser(strict = true): RequestHandler {
@@ -15,7 +15,7 @@ export default function fetchuser(strict = true): RequestHandler {
       req.user = user;
       next();
     } catch {
-      if (strict) authenticationError(res);
+      if (strict) authenticationError(res, "Session expired! Please login again.");
       else next();
     }
   };

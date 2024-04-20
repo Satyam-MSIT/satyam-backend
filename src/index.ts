@@ -4,6 +4,7 @@ import compression from "compression";
 
 import mongoConnect from "./modules/db";
 import authRouter from "./routes/auth";
+import satyamRouter from "./routes/satyam";
 import journalRouter, { initVolume } from "./routes/journal";
 import volumeRouter from "./routes/volume";
 import newsletterRouter from "./routes/newsletter";
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(compression());
 
 app.use("/auth", authRouter);
+app.use("/satyam", satyamRouter);
 app.use("/journal", journalRouter);
 app.use("/volume", volumeRouter);
 app.use("/newsletter", newsletterRouter);

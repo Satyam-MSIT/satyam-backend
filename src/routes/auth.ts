@@ -15,34 +15,39 @@ import { forgotSchema, loginSchema, otpSchema } from "../schemas/auth";
 
 const router = Router();
 
-router.post("/signup", fetchuser(false), verifyAdmin, async (req, res) => {
-  try {
-    const { name, email, password, type, alternateEmail } = req.data!;
-    let user = await User.findOne({ email });
-    if (user?.confirmed) return res.status(400).json({ success: false, error: "Email already exists" });
-    res.json({ success: true, msg: "Satyam account created successfully, please confirm your account via email to proceed!" });
-
-    const secPass = await bcrypt.hash(password, 10);
-    await retryAsync(
-      async () => {
-        if (!user) user = await User.create({ name, email, password: secPass, type, alternateEmail });
-        else {
-          user.name = name;
-          user.password = secPass;
-          if (type) user.type = type;
-          await user.save();
-        }
-      },
-      { retries: -1 }
-    );
-    sendMail(generateMessage(user!, "confirm"));
+router.post(
+  "/signup",
+  fetchuser(false),
+  verifyAdmin((req) => !req.data!.type.startsWith("satyam")),
+  async (req, res) => {
     try {
-      if (!type.startsWith("satyam")) Newsletter.create({ name, email });
-    } catch {}
-  } catch {
-    res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
+      const { name, email, password, type, alternateEmail } = req.data!;
+      let user = await User.findOne({ email });
+      if (user?.confirmed) return res.status(400).json({ success: false, error: "Email already exists" });
+      res.json({ success: true, msg: "Satyam account created successfully, please confirm your account via email to proceed!" });
+
+      const secPass = await bcrypt.hash(password, 10);
+      await retryAsync(
+        async () => {
+          if (!user) user = await User.create({ name, email, password: secPass, type, alternateEmail });
+          else {
+            user.name = name;
+            user.password = secPass;
+            if (type) user.type = type;
+            await user.save();
+          }
+        },
+        { retries: -1 }
+      );
+      sendMail(generateMessage(user!, "confirm"));
+      try {
+        if (!type.startsWith("satyam")) Newsletter.create({ name, email });
+      } catch {}
+    } catch {
+      res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
+    }
   }
-});
+);
 
 router.put("/confirm", async (req, res) => {
   try {
