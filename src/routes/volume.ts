@@ -40,7 +40,8 @@ router.post("/call", async (req, res) => {
     const newsletters = await Newsletter.find();
     await usePromises(newsletters.map((user) => sendMail(generateMessage(user, "call"))));
     res.json({ success: true, msg: "Call for papers created successfully!" });
-  } catch {
+  } catch (e) {
+    console.log(e);
     res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
   }
 });
