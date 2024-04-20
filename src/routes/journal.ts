@@ -48,7 +48,7 @@ router.post("/draft", upload.single("pdf"), checksize, async (req, res) => {
         abstract,
         keywords,
         reviewers,
-        versions: uploadFile ? [{ link: link!, name: originalname!, filename: filename! }] : [],
+        versions: uploadFile === "new" ? [{ link: link!, name: originalname!, filename: filename! }] : [],
       });
     } else {
       const updatedJournal: Partial<JournalType> = {};
@@ -60,6 +60,7 @@ router.post("/draft", upload.single("pdf"), checksize, async (req, res) => {
         const file = journal.versions[0];
         if (file) await deleteMega(file.name);
         if (uploadFile === "new") updatedJournal.versions = [{ link: link!, name: originalname!, filename: filename! }] as any;
+        else updatedJournal.versions = [] as any;
       }
       await journal.updateOne(updatedJournal);
     }
