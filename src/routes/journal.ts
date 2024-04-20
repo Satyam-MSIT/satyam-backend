@@ -1,10 +1,9 @@
 import { Router } from "express";
-import multer from "multer";
 import { sign } from "jssign";
 
 import Journal, { JournalType } from "../models/Journal";
 import checksize from "../middlewares/checksize";
-import { deleteMega, uploadMega } from "../modules/upload";
+import { deleteMega, upload, uploadMega } from "../modules/upload";
 import { deleteFile } from "../modules/file";
 import fetchuser from "../middlewares/fetchuser";
 import { draftSchema, submitSchema } from "../schemas/journal";
@@ -13,7 +12,6 @@ import { getLatestVolume, getYear } from "../modules/utilities";
 let currentYear: string, currentVolume: number;
 
 const router = Router();
-const upload = multer({ dest: "uploads" });
 
 const { LINK_SECRET } = process.env;
 

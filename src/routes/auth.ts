@@ -11,7 +11,9 @@ import { otpExpiry } from "../constants";
 import { generateMessage, sendMail } from "../modules/nodemailer";
 import { getStorage, removeStorage, setStorage } from "../modules/storage";
 import { generateToken, sanitizeUserAgent } from "../modules/token";
-import { forgotSchema, loginSchema, otpSchema } from "../schemas/auth";
+import { editSchema, forgotSchema, loginSchema, otpSchema } from "../schemas/auth";
+import { upload, uploadCloudinary } from "../modules/upload";
+import { deleteFile } from "../modules/file";
 
 const router = Router();
 
@@ -82,19 +84,41 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ success: false, error: "Sorry! Invalid Credentials" });
 
+    const { confirmed, id, name, type, image } = user;
+
     const pwdCompare = await bcrypt.compare(password, user.password as string);
     if (!pwdCompare) return res.status(400).json({ success: false, error: "Sorry! Invalid Credentials" });
 
-    if (!user.confirmed) {
+    if (!confirmed) {
       res.status(400).json({ success: false, error: "Please confirm your Satyam account first! To confirm, check your email." });
       return sendMail(generateMessage(user, "confirm"));
     }
 
-    const token = generateToken({ id: user.id, dimensions: headers.dimensions, origin: headers.origin, userAgent: sanitizeUserAgent(headers["user-agent"]!), tokenCreatedAt: Date.now() });
-    res.json({ success: true, msg: "Logged in successfully!", email: user.email, name: user.name, type: user.type, token });
+    const token = generateToken({ id, dimensions: headers.dimensions, origin: headers.origin, userAgent: sanitizeUserAgent(headers["user-agent"]!), tokenCreatedAt: Date.now() });
+    res.json({ success: true, msg: "Logged in successfully!", email, name, type, image, token });
     sendMail(generateMessage(user!, "login"));
   } catch (error) {
     res.status(500).json({ success: false, error: (error as Error).message });
+  }
+});
+
+router.put("/edit", fetchuser(), upload.single("image"), async (req, res) => {
+  const { body, id, file } = req;
+  try {
+    const { name, alternateEmail } = await editSchema.parseAsync(body);
+    const { filename, path } = file || {};
+    const user = (await User.findById(id))!;
+    if (name) user.name = name;
+    if (alternateEmail) user.alternateEmail = alternateEmail;
+    if (file) user.image = await uploadCloudinary(filename!, path!);
+    await user.save();
+    await deleteFile(path!);
+    res.json({ success: true, msg: "Account updated successfully!" });
+  } catch {
+    res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
+    try {
+      deleteFile(file);
+    } catch {}
   }
 });
 

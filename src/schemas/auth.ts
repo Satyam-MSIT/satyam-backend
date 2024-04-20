@@ -14,4 +14,9 @@ export const signupSchema = loginSchema.extend({
 
 export const forgotSchema = loginSchema.extend({ otp: z.string().length(6) });
 
+export const editSchema = z.object({
+  name: z.string().min(1).max(50).optional(),
+  alternateEmail: z.string().email().optional(),
+});
+
 export type SignupData = z.infer<typeof signupSchema>;

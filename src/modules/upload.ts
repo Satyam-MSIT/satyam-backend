@@ -1,12 +1,15 @@
 import { Storage } from "megajs";
 import { createReadStream } from "fs";
 import { v2 } from "cloudinary";
+import multer from "multer";
 
 const { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME, MEGA_EMAIL, MEGA_PASSWORD } = process.env;
 let mega: Storage;
 
+export const upload = multer({ dest: "uploads" });
+
 export const initUpload = async () => {
-  // v2.config({ cloud_name: CLOUDINARY_CLOUD_NAME, api_key: CLOUDINARY_API_KEY, api_secret: CLOUDINARY_API_SECRET, secure: true });
+  v2.config({ cloud_name: CLOUDINARY_CLOUD_NAME, api_key: CLOUDINARY_API_KEY, api_secret: CLOUDINARY_API_SECRET, secure: true });
   mega = await new Storage({ email: MEGA_EMAIL, password: MEGA_PASSWORD }).ready;
 };
 

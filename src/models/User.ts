@@ -10,6 +10,7 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     lastPasswordModifiedAt: { type: Number, default: Date.now },
     type: { type: String, required: true, enum: types },
+    image: { type: String },
     confirmed: { type: Boolean, default: false },
     journal_ids: [{ type: [Types.ObjectId], default: [], ref: "journal" }],
     // author_id: { type: Types.ObjectId, ref: "author" },
