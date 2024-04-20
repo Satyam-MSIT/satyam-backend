@@ -6,6 +6,7 @@ import { generateOTP, retryAsync } from "utility-kit";
 import fetchuser from "../middlewares/fetchuser";
 import verifyAdmin from "../middlewares/verifyAdmin";
 import User from "../models/User";
+import Newsletter from "../models/Newsletter";
 import { otpExpiry } from "../constants";
 import { generateMessage, sendMail } from "../modules/nodemailer";
 import { getStorage, removeStorage, setStorage } from "../modules/storage";
@@ -34,7 +35,10 @@ router.post("/signup", fetchuser(false), verifyAdmin, async (req, res) => {
       },
       { retries: -1 }
     );
-    sendMail(generateMessage(user!));
+    sendMail(generateMessage(user!, "confirm"));
+    try {
+      Newsletter.create({ name, email });
+    } catch {}
   } catch {
     res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
   }
@@ -59,7 +63,7 @@ router.get("/confirm/reset", async (req, res) => {
   try {
     const { id } = jwt.verify(req.headers.token as string, process.env.EMAIL_SECRET, { ignoreExpiration: true }) as { id: string };
     const user = await User.findById(id);
-    sendMail(generateMessage(user!));
+    sendMail(generateMessage(user!, "confirm"));
     res.json({ success: true });
   } catch {
     res.status(400).json({ success: false, error: "Bad request" });
@@ -78,7 +82,7 @@ router.post("/login", async (req, res) => {
 
     if (!user.confirmed) {
       res.status(400).json({ success: false, error: "Please confirm your Satyam account first! To confirm, check your email." });
-      return sendMail(generateMessage(user));
+      return sendMail(generateMessage(user, "confirm"));
     }
 
     const token = generateToken({ id: user.id, dimensions: headers.dimensions, origin: headers.origin, userAgent: sanitizeUserAgent(headers["user-agent"]!), tokenCreatedAt: Date.now() });
@@ -107,7 +111,7 @@ router.post("/otp", async (req, res) => {
     if (!user) return res.status(404).json({ success: false, error: "Sorry! No user found with this email." });
     const otp = generateOTP(6);
     res.json({ success: true, msg: "OTP sent successfully!" });
-    sendMail(generateMessage({ email }, "otp", otp), () => {
+    sendMail(generateMessage({ email }, "otp", { otp }), () => {
       setStorage(email, otp);
       setTimeout(() => removeStorage(email), otpExpiry);
     });

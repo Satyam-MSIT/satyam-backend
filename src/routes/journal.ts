@@ -8,24 +8,41 @@ import { deleteMega, uploadMega } from "../modules/upload";
 import { deleteFile } from "../modules/file";
 import fetchuser from "../middlewares/fetchuser";
 import { draftSchema, submitSchema } from "../schemas/journal";
-import { currentVolume, currentYear } from "../constants";
+import { getLatestVolume, getYear } from "../modules/utilities";
+
+let currentYear: string, currentVolume: number;
 
 const router = Router();
 const upload = multer({ dest: "uploads" });
 
-const { LINK_SECRET, PORT, RENDER_EXTERNAL_URL } = process.env;
+const { LINK_SECRET } = process.env;
 
-const url = RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+export async function initVolume() {
+  const volume = await getLatestVolume();
+  currentYear = getYear(volume.createdAt);
+  currentVolume = volume.number!;
+}
 
 router.use(fetchuser());
 
 router.get("/all", async (req, res) => {
   try {
     const { id } = req;
-    const journals = await Journal.find({ user: id });
+    const journals = await Journal.find({ author_id: id });
     res.json({ success: true, journals });
   } catch {
     res.status(500).json({ success: false, error: "Something went wrong! Try again..." });
+  }
+});
+
+router.get("/draft/:id", async (req, res) => {
+  try {
+    const { id, params } = req;
+    const { versions, ...journal } = (await Journal.findOne({ author_id: id, journal_id: params.id }))!;
+    const { name, link } = versions[0] || {};
+    res.json({ success: true, journal: { ...journal, file: { name, link } } });
+  } catch {
+    res.status(404).json({ success: false, error: "Journal draft doesn't exist" });
   }
 });
 

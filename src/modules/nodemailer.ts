@@ -4,14 +4,21 @@ import { retryAsync } from "utility-kit";
 import { expiresIn } from "../constants";
 import { UserType } from "../models/User";
 
-type MessageType = "confirm" | "login" | "otp";
+type MessageType = "confirm" | "login" | "otp" | "call";
 
-type Message = {
+type GenerateMessageProps = { otp?: string };
+
+type BaseMessage = {
   from: string;
   to: string;
-  subject?: string;
-  html?: string;
 };
+
+type MessageExtension = {
+  subject: string;
+  html: string;
+};
+
+type Message = BaseMessage & MessageExtension;
 
 const { CORS, EMAIL_SECRET, GMAIL_USER, GMAIL_PASS } = process.env;
 
@@ -21,35 +28,45 @@ const transporter = createTransport({
   tls: { requestCert: true, rejectUnauthorized: true },
 });
 
-export function generateMessage({ id, name, email }: Partial<UserType>, type: MessageType = "confirm", otp?: string) {
-  const message: Message = { from: "Satyamwebsite@gmail.com", to: email! };
-  if (type === "confirm") {
-    message.subject = "Confirm Your Satyam Account";
-    message.html = `<div>
-      <p>Hello <input disabled style="margin:0;padding:0;color:black;background-color:transparent;border:none;min-width: 20rem;cursor:text" value='${name}!'>
-      <br>
-      Thanks for choosing Satyam - The cloud file sharing website! Click below to confirm your Satyam account (Valid only for next ${expiresIn}):</p>
-      <a href=${CORS}/auth/verify?token=${sign({ id }, EMAIL_SECRET, { expiresIn })}>Confirm Account</a>
-      <br>
-      <p>Not You? No worries, just ignore this mail!</p>
-      <br>
-      <p>E-mail sent to you by <a href=${CORS}>Satyam</a></p>
-    <div>`;
-  } else if (type === "login") {
-    message.subject = "Login Successful";
-    message.html = `<div>
-      <p>Login Successful</p>
-    <div>`;
-  } else if (type === "otp") {
-    message.subject = "OTP for your Satyam account";
-    message.html = `<div>
-      <p>Below is the OTP for your Satyam account associated with the email id ${email} (Valid only for next 5 minutes):</p>
-      <h3>${otp}</h3>
-      <br>
-      <p><strong>WARNING:</strong> Don't share the OTP with anyone to maintain your account security.</p>
-    <div>`;
-  }
-  return message;
+export function generateMessage({ id, name, email }: Partial<UserType>, type: MessageType, { otp }: GenerateMessageProps = {}): Message {
+  const baseMessage: BaseMessage = { from: "Satyamwebsite@gmail.com", to: email! };
+  const messageExtensions: { [key: string]: MessageExtension } = {
+    confirm: {
+      subject: "Confirm Your Satyam Account",
+      html: `<div>
+        <p>Hello <input disabled style="margin:0;padding:0;color:black;background-color:transparent;border:none;min-width: 20rem;cursor:text" value='${name}!'>
+        <br>
+        Thanks for choosing Satyam - The cloud file sharing website! Click below to confirm your Satyam account (Valid only for next ${expiresIn}):</p>
+        <a href=${CORS}/auth/verify?token=${sign({ id }, EMAIL_SECRET, { expiresIn })}>Confirm Account</a>
+        <br>
+        <p>Not You? No worries, just ignore this mail!</p>
+        <br>
+        <p>E-mail sent to you by <a href=${CORS}>Satyam</a></p>
+      <div>`,
+    },
+    login: {
+      subject: "Login Successful",
+      html: `<div>
+        <p>Login Successful</p>
+      <div>`,
+    },
+    otp: {
+      subject: "OTP for your Satyam account",
+      html: `<div>
+        <p>Below is the OTP for your Satyam account associated with the email id ${email} (Valid only for next 5 minutes):</p>
+        <h3>${otp}</h3>
+        <br>
+        <p><strong>WARNING:</strong> Don't share the OTP with anyone to maintain your account security.</p>
+      <div>`,
+    },
+    call: {
+      subject: "Call for Papers",
+      html: `<div>
+        <p>This is a call for paper</p>
+      <div>`,
+    },
+  };
+  return { ...baseMessage, ...messageExtensions[type]! };
 }
 
 export async function sendMail(message: Message, onSuccess = () => {}) {

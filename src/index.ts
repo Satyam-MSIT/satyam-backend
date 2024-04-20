@@ -1,9 +1,12 @@
 import express from "express";
 import cors from "cors";
 import compression from "compression";
+
 import mongoConnect from "./modules/db";
 import authRouter from "./routes/auth";
-import journalRouter from "./routes/journal";
+import journalRouter, { initVolume } from "./routes/journal";
+import volumeRouter from "./routes/volume";
+import newsletterRouter from "./routes/newsletter";
 
 const app = express();
 const { PORT } = process.env;
@@ -18,10 +21,13 @@ app.use(compression());
 
 app.use("/auth", authRouter);
 app.use("/journal", journalRouter);
+app.use("/volume", volumeRouter);
+app.use("/newsletter", newsletterRouter);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Satyam Backend is running at ${PORT}`);
-  mongoConnect();
+  await mongoConnect();
+  initVolume();
 });
 
 process.on("uncaughtException", (err) => {
