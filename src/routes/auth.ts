@@ -37,7 +37,7 @@ router.post("/signup", fetchuser(false), verifyAdmin, async (req, res) => {
     );
     sendMail(generateMessage(user!, "confirm"));
     try {
-      Newsletter.create({ name, email });
+      if (!type.startsWith("satyam")) Newsletter.create({ name, email });
     } catch {}
   } catch {
     res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
