@@ -80,6 +80,7 @@ router.get("/confirm/reset", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { body, headers } = req;
+    const { dimensions, origin } = headers;
     const { email, password } = await loginSchema.parseAsync(body);
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ success: false, error: "Sorry! Invalid Credentials" });
@@ -94,7 +95,7 @@ router.post("/login", async (req, res) => {
       return sendMail(generateMessage(user, "confirm"));
     }
 
-    const token = generateToken({ id, dimensions: headers.dimensions, origin: headers.origin, userAgent: sanitizeUserAgent(headers["user-agent"]!), tokenCreatedAt: Date.now() });
+    const token = generateToken({ id, dimensions, origin, userAgent: sanitizeUserAgent(headers["user-agent"]!), tokenCreatedAt: Date.now() });
     res.json({ success: true, msg: "Logged in successfully!", email, name, type, image, token });
     sendMail(generateMessage(user!, "login"));
   } catch (error) {
@@ -112,6 +113,7 @@ router.put("/edit", fetchuser(), upload.single("image"), async (req, res) => {
     if (alternateEmail) user.alternateEmail = alternateEmail;
     if (file) user.image = await uploadCloudinary(filename!, path!);
     await user.save();
+    removeStorage(`user-${id}`);
     await deleteFile(path!);
     res.json({ success: true, msg: "Account updated successfully!" });
   } catch {
@@ -160,7 +162,7 @@ router.put("/forgot", async (req, res) => {
     const secPass = await bcrypt.hash(password, 10);
     await User.findOneAndUpdate({ email }, { password: secPass, lastPasswordModifiedAt: Date.now(), confirmed: true });
     removeStorage(email!);
-    removeStorage(`user-${user._id}`);
+    removeStorage(`user-${user.id}`);
     res.json({ success: true, msg: "Password reset successful!" });
   } catch {
     res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });

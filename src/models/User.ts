@@ -1,6 +1,6 @@
 import { InferSchemaType, Schema, Types, model } from "mongoose";
-import { types } from "../schemas/auth";
 import { reviewerSchema } from "./Reviewer";
+import { types } from "../constants";
 
 const userSchema = new Schema(
   {
@@ -11,6 +11,7 @@ const userSchema = new Schema(
     lastPasswordModifiedAt: { type: Number, default: Date.now },
     type: { type: String, required: true, enum: types },
     image: { type: String },
+    active: { type: Boolean, default: true },
     confirmed: { type: Boolean, default: false },
     journal_ids: [{ type: [Types.ObjectId], default: [], ref: "journal" }],
     // author_id: { type: Types.ObjectId, ref: "author" },
