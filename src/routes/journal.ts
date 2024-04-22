@@ -7,9 +7,9 @@ import { deleteMega, upload, uploadMega } from "../modules/upload";
 import { deleteFile } from "../modules/file";
 import fetchuser from "../middlewares/fetchuser";
 import { draftSchema, submitSchema } from "../schemas/journal";
-import { getLatestVolume, getYear } from "../modules/utilities";
+import { getLatestVolume, getYear, numToString } from "../modules/utilities";
 
-let currentYear: string, currentVolume: number;
+let currentYear: string, currentVolume: string;
 
 const router = Router();
 
@@ -18,7 +18,7 @@ const { LINK_SECRET } = process.env;
 export async function initVolume() {
   const volume = await getLatestVolume();
   currentYear = getYear(volume.createdAt);
-  currentVolume = volume.number!;
+  currentVolume = numToString(volume.number!);
 }
 
 router.use(fetchuser());
