@@ -6,7 +6,7 @@ import path from "path";
 
 const { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME, MEGA_EMAIL, MEGA_PASSWORD } = process.env;
 let mega: Storage;
-const filetypes = /png/;
+const filetypes = /pdf/;
 
 export const upload = multer({
   dest: "uploads",
@@ -23,21 +23,13 @@ export const initUpload = async () => {
 };
 
 export async function uploadCloudinary(name: string, path: string) {
-  try {
-    const file = await v2.uploader.upload(path, { public_id: name, resource_type: "raw", filename_override: "." });
-    return file.secure_url;
-  } catch {
-    return "";
-  }
+  const file = await v2.uploader.upload(path, { public_id: name, resource_type: "raw", filename_override: "." });
+  return file.secure_url;
 }
 
 export async function uploadMega(name: string, path: string, size: number) {
-  try {
-    const file = await mega.upload({ name, size }, createReadStream(path) as any).complete;
-    return await file.link(false);
-  } catch {
-    return "";
-  }
+  const file = await mega.upload({ name, size }, createReadStream(path) as any).complete;
+  return await file.link(false);
 }
 
 export async function deleteMega(filename: string) {

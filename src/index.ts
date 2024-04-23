@@ -8,6 +8,7 @@ import satyamRouter from "./routes/satyam";
 import journalRouter, { initVolume } from "./routes/journal";
 import volumeRouter from "./routes/volume";
 import newsletterRouter from "./routes/newsletter";
+import { initUpload } from "./modules/upload";
 
 const app = express();
 const { PORT } = process.env;
@@ -29,7 +30,8 @@ app.use("/newsletter", newsletterRouter);
 app.listen(PORT, async () => {
   console.log(`Satyam Backend is running at ${PORT}`);
   await mongoConnect();
-  initVolume();
+  await initVolume();
+  await initUpload();
 });
 
 process.on("uncaughtException", (err) => {
