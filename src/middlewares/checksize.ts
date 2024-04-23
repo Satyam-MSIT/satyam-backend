@@ -4,7 +4,8 @@ import { deleteFile } from "../modules/file";
 
 const checksize: RequestHandler = async (req, res, next) => {
   try {
-    const { path, size } = req.file!;
+    if (!req.file) return next();
+    const { path, size } = req.file;
     if (!size) {
       res.status(400).json({ success: false, error: "Empty file(s)" });
       deleteFile(path);

@@ -60,8 +60,7 @@ router.put("/confirm", async (req, res) => {
     } catch {
       res.status(404).json({ success: false, error: "User not found!" });
     }
-  } catch (e) {
-    console.log(e);
+  } catch {
     res.status(401).json({ success: false, error: "Confirmation token expired!" });
   }
 });

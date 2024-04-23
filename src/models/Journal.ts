@@ -26,9 +26,9 @@ export const journalSchema = new Schema(
     author_reviewers: {
       type: [String],
       default: [],
-      validate: {
-        validator: (value: string[]) => value.length >= 3,
-      },
+      // validate: {
+      //   validator: (value: string[]) => value.length >= 3,
+      // },
     },
     reviewers: {
       type: [
