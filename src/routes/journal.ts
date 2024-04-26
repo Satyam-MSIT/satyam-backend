@@ -3,7 +3,7 @@ import { sign } from "jssign";
 
 import Journal, { JournalType } from "../models/Journal";
 import checksize from "../middlewares/checksize";
-import { deleteMega, upload, uploadMega } from "../modules/upload";
+import { deleteMega, upload, uploadCloudinary, uploadMega } from "../modules/upload";
 import { deleteFile } from "../modules/file";
 import fetchuser from "../middlewares/fetchuser";
 import { draftSchema, submitSchema } from "../schemas/journal";
@@ -50,7 +50,7 @@ router.post("/draft", upload.single("pdf"), checksize, async (req, res) => {
     const { journal_id, title, abstract, uploadFile, keywords, reviewers } = await draftSchema.parseAsync(body);
     if (uploadFile === "new") {
       var { originalname, filename, path, size } = file!;
-      var link = sign(await uploadMega(filename, path, size), LINK_SECRET);
+      var link = sign(await uploadCloudinary(filename, path), LINK_SECRET);
     }
 
     let journal = await Journal.findOne({ journal_id });
@@ -93,8 +93,8 @@ router.post("/submit", upload.single("pdf"), checksize, async (req, res) => {
   const { body, file, id, user } = req;
   try {
     const { journal_id, title, abstract, keywords, reviewers } = await submitSchema.parseAsync(body);
-    const { originalname, filename, path, size } = file!;
-    const link = sign(await uploadMega(filename, path, size), LINK_SECRET);
+    const { originalname, filename, path } = file!;
+    const link = sign(await uploadCloudinary(filename, path), LINK_SECRET);
 
     let journal = await Journal.findOne({ journal_id });
     const count = await Journal.countDocuments({ journal_id: { $regex: `^${currentYear}${currentVolume}` } });

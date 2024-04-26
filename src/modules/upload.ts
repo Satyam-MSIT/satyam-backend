@@ -19,7 +19,7 @@ export const upload = multer({
 
 export const initUpload = async () => {
   v2.config({ cloud_name: CLOUDINARY_CLOUD_NAME, api_key: CLOUDINARY_API_KEY, api_secret: CLOUDINARY_API_SECRET, secure: true });
-  mega = await new Storage({ email: MEGA_EMAIL, password: MEGA_PASSWORD }).ready;
+  // mega = await new Storage({ email: MEGA_EMAIL, password: MEGA_PASSWORD }).ready;
 };
 
 export async function uploadCloudinary(name: string, path: string) {
