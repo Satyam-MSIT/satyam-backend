@@ -8,6 +8,9 @@ export function getYear(date?: Date) {
   return (date || new Date()).getFullYear().toString().slice(2);
 }
 
-export function numToString(number: number) {
-  return (number < 10 ? "0" : "") + number;
+export function numToString(number: number, n: number = 4) {
+  let result = number.toString();
+  const length = result.length;
+  if (length < n) result = "0".repeat(n - length) + result;
+  return result;
 }

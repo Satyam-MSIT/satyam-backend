@@ -18,7 +18,7 @@ const { LINK_SECRET } = process.env;
 export async function initVolume() {
   const { createdAt, number } = await getLatestVolume();
   currentYear = getYear(createdAt);
-  currentVolume = numToString(number!);
+  currentVolume = numToString(number!, 2);
 }
 
 router.use(fetchuser());
@@ -49,7 +49,7 @@ router.post("/draft", upload.single("pdf"), checksize, async (req, res) => {
   try {
     const { journal_id, title, abstract, uploadFile, keywords, reviewers } = await draftSchema.parseAsync(body);
     if (uploadFile === "new") {
-      var { originalname, filename, path, size } = file!;
+      var { originalname, filename, path } = file!;
       var link = sign(await uploadCloudinary(filename, path), LINK_SECRET);
     }
 
@@ -98,7 +98,7 @@ router.post("/submit", upload.single("pdf"), checksize, async (req, res) => {
 
     let journal = await Journal.findOne({ journal_id });
     const count = await Journal.countDocuments({ journal_id: { $regex: `^${currentYear}${currentVolume}` } });
-    const newJournalId = currentYear + currentVolume + count;
+    const newJournalId = currentYear + currentVolume + numToString(count);
     if (!journal) {
       journal = await Journal.create({
         journal_id: newJournalId,
