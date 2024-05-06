@@ -140,7 +140,7 @@ router.get(
   "/fetch/:id",
   useErrorHandler(async (req, res) => {
     const { params, id } = req;
-    const journal = await Journal.findOne({ _id: params.id, author_id: id });
+    const journal = await Journal.findOne({ journal_id: params.id, author_id: id });
     res.json({ success: true, journal });
   })
 );
