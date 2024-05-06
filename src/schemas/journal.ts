@@ -16,6 +16,8 @@ export const draftSchema = z.object({
     .optional(),
 });
 
+export const finalSchema = z.object({ journal_id: z.string() });
+
 export const submitSchema = z.object({
   journal_id: z.string().optional(),
   abstract: z.string(),

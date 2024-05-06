@@ -21,6 +21,8 @@ export const journalSchema = new Schema(
       ],
     },
     keywords: { type: [String] },
+    copyright: { type: String },
+    print_version: { type: String },
     author_id: { type: Types.ObjectId, ref: "user" },
     author_name: { type: String },
     author_reviewers: {

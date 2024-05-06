@@ -2,11 +2,13 @@ import { Router } from "express";
 
 import Newsletter from "../models/Newsletter";
 import { subscribeSchema, unsubscribeSchema } from "../schemas/newsletter";
+import useErrorHandler from "../middlewares/useErrorHandler";
 
 const router = Router();
 
-router.post("/subscribe", async (req, res) => {
-  try {
+router.post(
+  "/subscribe",
+  useErrorHandler(async (req, res) => {
     const { name, email } = await subscribeSchema.parseAsync(req.body);
     try {
       await Newsletter.create({ name, email });
@@ -14,19 +16,16 @@ router.post("/subscribe", async (req, res) => {
     } catch {
       res.status(409).json({ success: false, error: "You are already subscribed to our Newsletter!" });
     }
-  } catch {
-    res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
-  }
-});
+  })
+);
 
-router.post("/unsubscribe", async (req, res) => {
-  try {
+router.post(
+  "/unsubscribe",
+  useErrorHandler(async (req, res) => {
     const { email } = await unsubscribeSchema.parseAsync(req.body);
     await Newsletter.findOneAndDelete({ email });
     res.json({ success: true, msg: "Successfully unsubscribed to the Newsletter!" });
-  } catch {
-    res.status(500).json({ success: false, error: "Uh Oh, Something went wrong!" });
-  }
-});
+  })
+);
 
 export default router;
