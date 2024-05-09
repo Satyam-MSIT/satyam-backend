@@ -105,7 +105,7 @@ router.post(
 
       let journal = await Journal.findOne({ journal_id, author_id: id });
       const count = await Journal.countDocuments({ journal_id: { $regex: `^${currentYear}${currentVolume}` } });
-      const newJournalId = currentYear + currentVolume + numToString(count);
+      const newJournalId = currentYear + numToString(+currentVolume, 3) + numToString(count);
       if (!journal) {
         journal = await Journal.create({
           journal_id: newJournalId,

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const volumeSchema = z.object({
-  number: z.number().gte(1).lte(99).optional(),
+  number: z.number().gte(1).lte(999).optional(),
   title: z.string(),
   description: z.string(),
   keywords: z.array(z.string()),
