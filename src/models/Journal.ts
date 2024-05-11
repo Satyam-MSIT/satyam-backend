@@ -25,6 +25,15 @@ export const journalSchema = new Schema(
     print_version: { type: String },
     author_id: { type: Types.ObjectId, ref: "user" },
     author_name: { type: String },
+    authors: {
+      type: [
+        {
+          name: String,
+          email: String,
+        },
+      ],
+      default: [],
+    },
     author_reviewers: {
       type: [String],
       default: [],

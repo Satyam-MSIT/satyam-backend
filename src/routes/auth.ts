@@ -23,7 +23,7 @@ router.post(
   fetchuser(false),
   verifyAdmin((req) => !req.data!.type.startsWith("satyam")),
   useErrorHandler(async (req, res) => {
-    const { name, email, password, type, alternateEmail } = req.data!;
+    const { name, email, password, type, mobile } = req.data!;
     let user = await User.findOne({ email });
     if (user?.confirmed) return res.status(400).json({ success: false, error: "Email already exists" });
     res.json({ success: true, msg: "Satyam account created successfully, please confirm your account via email to proceed!" });
@@ -31,7 +31,7 @@ router.post(
     const secPass = await bcrypt.hash(password, 10);
     await retryAsync(
       async () => {
-        if (!user) user = await User.create({ name, email, password: secPass, type, alternateEmail });
+        if (!user) user = await User.create({ name, email, password: secPass, type, mobile });
         else {
           user.name = name;
           user.password = secPass;
@@ -109,11 +109,11 @@ router.put(
   useErrorHandler(
     async (req, res) => {
       const { body, id, file } = req;
-      const { name, alternateEmail } = await editSchema.parseAsync(body);
+      const { name, mobile } = await editSchema.parseAsync(body);
       const { filename, path } = file || {};
       const user = (await User.findById(id))!;
       if (name) user.name = name;
-      if (alternateEmail) user.alternateEmail = alternateEmail;
+      if (mobile) user.mobile = mobile;
       if (file) user.image = await uploadCloudinary(filename!, path!);
       await user.save();
       removeStorage(`user-${id}`);

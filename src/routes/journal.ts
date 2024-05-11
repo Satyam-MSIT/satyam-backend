@@ -19,7 +19,7 @@ const { LINK_SECRET } = process.env;
 export async function initVolume() {
   const { createdAt, number } = await getLatestVolume();
   currentYear = getYear(createdAt);
-  currentVolume = numToString(number!, 2);
+  currentVolume = number!;
 }
 
 router.use(fetchuser());

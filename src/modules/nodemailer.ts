@@ -2,20 +2,27 @@ import { createTransport } from "nodemailer";
 import { sign } from "jsonwebtoken";
 import { retryAsync } from "utility-kit";
 import { expiresIn } from "../constants";
-import { UserType } from "../models/User";
 
-type MessageType = "confirm" | "login" | "otp" | "call";
+const types = ["default", "confirm", "login", "otp", "call"] as const;
+
+type MessageType = (typeof types)[number];
+
+type GenerateMessageOptions = {
+  id?: string;
+  name?: string;
+  email: string | string[];
+} & MessageExtension;
 
 type GenerateMessageProps = { otp?: string };
 
 type BaseMessage = {
   from: string;
-  to: string;
+  to: string | string[];
 };
 
 type MessageExtension = {
-  subject: string;
-  html: string;
+  subject?: string;
+  html?: string;
 };
 
 type Message = BaseMessage & MessageExtension;
@@ -28,9 +35,16 @@ const transporter = createTransport({
   tls: { requestCert: true, rejectUnauthorized: true },
 });
 
-export function generateMessage({ id, name, email }: Partial<UserType>, type: MessageType, { otp }: GenerateMessageProps = {}): Message {
-  const baseMessage: BaseMessage = { from: "Satyamwebsite@gmail.com", to: email! };
-  const messageExtensions: { [key: string]: MessageExtension } = {
+export function generateMessage({ id, name, email, subject, html }: GenerateMessageOptions, type: MessageType = "default", { otp }: GenerateMessageProps = {}): Message {
+  const baseMessage: BaseMessage = { from: "Satyamwebsite@gmail.com", to: email };
+  const messageExtensions: { [key in MessageType]: MessageExtension } = {
+    default: {
+      subject: subject!,
+      html: `<div>
+      <h4>Hi, ${name}</h4>
+      ${html}
+    </div>`,
+    },
     confirm: {
       subject: "Confirm Your Satyam Account",
       html: `<div>
@@ -66,7 +80,7 @@ export function generateMessage({ id, name, email }: Partial<UserType>, type: Me
       <div>`,
     },
   };
-  return { ...baseMessage, ...messageExtensions[type]! };
+  return { ...baseMessage, ...messageExtensions[type] };
 }
 
 export async function sendMail(message: Message, onSuccess = () => {}) {

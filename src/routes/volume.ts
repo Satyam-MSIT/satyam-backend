@@ -22,9 +22,9 @@ router.get(
 router.get(
   "/latest",
   useErrorHandler(async (_, res) => {
-    const { number, title, description, keywords } = (await Volume.findOne().sort("-number"))!;
-    const journals = await Journal.find({ journal_id: { $regex: `^\d{2}${number}` } });
-    res.json({ success: true, title, description, keywords, journals });
+    const volume = (await Volume.findOne().sort("-number"))!;
+    const journals = await Journal.find({ journal_id: { $regex: `^\d{2}${volume.number}` } });
+    res.json({ success: true, volume, journals });
   })
 );
 
@@ -32,10 +32,6 @@ router.post(
   "/call",
   useErrorHandler(async (req, res) => {
     let { number, title, description, keywords, acceptanceTill, publishDate, acceptancePing, reviewPing } = await volumeSchema.parseAsync(req.body);
-    if (!number) {
-      const volume = await getLatestVolume();
-      number = volume.number! + 1;
-    }
     await Volume.create({ number, title, description, keywords, acceptanceTill, publishDate, acceptancePing, reviewPing });
     const newsletters = await Newsletter.find();
     await usePromises(newsletters.map((user) => sendMail(generateMessage(user, "call"))));
