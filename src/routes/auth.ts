@@ -98,7 +98,6 @@ router.post(
 
     const token = generateToken({ id, dimensions, origin, userAgent: sanitizeUserAgent(headers["user-agent"]!), tokenCreatedAt: Date.now() });
     res.json({ success: true, msg: "Logged in successfully!", email, name, type, image, token });
-    sendMail(generateMessage(user!, "login"));
   })
 );
 

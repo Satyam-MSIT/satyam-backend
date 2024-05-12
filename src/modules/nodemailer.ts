@@ -4,7 +4,7 @@ import { retryAsync } from "utility-kit";
 import { expiresIn } from "../constants";
 import { File } from "./file";
 
-const types = ["default", "confirm", "login", "otp", "call"] as const;
+const types = ["default", "confirm", "otp", "call"] as const;
 
 type MessageType = (typeof types)[number];
 
@@ -49,12 +49,6 @@ export function generateMessage({ id, name, email, subject, html, files }: Gener
         <p>Not You? No worries, just ignore this mail!</p>
         <br>
         <p>E-mail sent to you by <a href=${CORS}>Satyam</a></p>
-      <div>`,
-    },
-    login: {
-      subject: "Login Successful",
-      html: `<div>
-        <p>Login Successful</p>
       <div>`,
     },
     otp: {
