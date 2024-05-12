@@ -1,7 +1,8 @@
-import { createTransport } from "nodemailer";
+import { SendMailOptions, createTransport } from "nodemailer";
 import { sign } from "jsonwebtoken";
 import { retryAsync } from "utility-kit";
 import { expiresIn } from "../constants";
+import { File } from "./file";
 
 const types = ["default", "confirm", "login", "otp", "call"] as const;
 
@@ -11,21 +12,12 @@ type GenerateMessageOptions = {
   id?: string;
   name?: string;
   email: string | string[];
-} & MessageExtension;
-
-type GenerateMessageProps = { otp?: string };
-
-type BaseMessage = {
-  from: string;
-  to: string | string[];
-};
-
-type MessageExtension = {
   subject?: string;
   html?: string;
+  files?: File[];
 };
 
-type Message = BaseMessage & MessageExtension;
+type GenerateMessageProps = { otp?: string };
 
 const { CORS, EMAIL_SECRET, GMAIL_USER, GMAIL_PASS } = process.env;
 
@@ -35,15 +27,16 @@ const transporter = createTransport({
   tls: { requestCert: true, rejectUnauthorized: true },
 });
 
-export function generateMessage({ id, name, email, subject, html }: GenerateMessageOptions, type: MessageType = "default", { otp }: GenerateMessageProps = {}): Message {
-  const baseMessage: BaseMessage = { from: "Satyamwebsite@gmail.com", to: email };
-  const messageExtensions: { [key in MessageType]: MessageExtension } = {
+export function generateMessage({ id, name, email, subject, html, files }: GenerateMessageOptions, type: MessageType = "default", { otp }: GenerateMessageProps = {}): SendMailOptions {
+  const baseMessage = { to: email };
+  const messageExtensions: { [key in MessageType]: SendMailOptions } = {
     default: {
-      subject: subject!,
+      subject,
       html: `<div>
-      <h4>Hi, ${name}</h4>
-      ${html}
-    </div>`,
+        <h4>Hi, ${name}</h4>
+        ${html}
+      </div>`,
+      attachments: files?.map(({ filename, path }) => ({ filename, path })),
     },
     confirm: {
       subject: "Confirm Your Satyam Account",
@@ -83,6 +76,6 @@ export function generateMessage({ id, name, email, subject, html }: GenerateMess
   return { ...baseMessage, ...messageExtensions[type] };
 }
 
-export async function sendMail(message: Message, onSuccess = () => {}) {
+export async function sendMail(message: SendMailOptions, onSuccess = () => {}) {
   await retryAsync(async () => await new Promise((resolve, reject) => transporter.sendMail(message, (error) => (error ? reject() : resolve(void 0)))), { onSuccess });
 }

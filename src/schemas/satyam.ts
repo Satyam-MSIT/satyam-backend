@@ -6,3 +6,8 @@ export const editSchema = z.object({
   type: z.enum(types).optional(),
   active: z.boolean().optional(),
 });
+
+export const emailSchema = z.object({
+  subject: z.string(),
+  html: z.string(),
+});

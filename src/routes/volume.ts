@@ -3,7 +3,6 @@ import { Router } from "express";
 import { volumeSchema } from "../schemas/volume";
 import Volume from "../models/Volume";
 import Journal from "../models/Journal";
-import { getLatestVolume } from "../modules/utilities";
 import Newsletter from "../models/Newsletter";
 import { usePromises } from "../modules/promise";
 import { generateMessage, sendMail } from "../modules/nodemailer";
