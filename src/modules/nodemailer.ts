@@ -4,7 +4,7 @@ import { retryAsync } from "utility-kit";
 import { expiresIn } from "../constants";
 import { File } from "./file";
 
-const types = ["default", "confirm", "otp", "call"] as const;
+const types = ["default", "confirm", "otp"] as const;
 
 type MessageType = (typeof types)[number];
 
@@ -58,12 +58,6 @@ export function generateMessage({ id, name, email, subject, html, files }: Gener
         <h3>${otp}</h3>
         <br>
         <p><strong>WARNING:</strong> Don't share the OTP with anyone to maintain your account security.</p>
-      <div>`,
-    },
-    call: {
-      subject: "Call for Papers",
-      html: `<div>
-        <p>This is a call for paper</p>
       <div>`,
     },
   };

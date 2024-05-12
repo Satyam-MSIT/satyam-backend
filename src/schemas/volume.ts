@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { emailSchema } from "./satyam";
 
-export const volumeSchema = z.object({
+export const volumeSchema = emailSchema.extend({
   number: z.string().length(5),
   title: z.string(),
   description: z.string(),
