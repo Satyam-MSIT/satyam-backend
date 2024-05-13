@@ -6,6 +6,15 @@ export const draftSchema = z.object({
   title: z.string().optional(),
   uploadFile: z.enum(["new", "keep", "delete"]),
   keywords: z.array(z.string()).optional(),
+  corresponding_author: z.string().email().optional(),
+  authors: z
+    .array(
+      z.object({
+        name: z.string(),
+        email: z.string().email(),
+      })
+    )
+    .optional(),
   reviewers: z
     .array(
       z.object({
@@ -23,5 +32,7 @@ export const submitSchema = z.object({
   abstract: z.string(),
   title: z.string(),
   keywords: z.array(z.string()),
+  corresponding_author: z.string().email(),
+  authors: z.array(z.object({ name: z.string(), email: z.string().email() })),
   reviewers: z.array(z.object({ name: z.string(), email: z.string().email() })),
 });

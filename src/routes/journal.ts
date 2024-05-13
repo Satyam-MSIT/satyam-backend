@@ -27,8 +27,8 @@ router.use(fetchuser());
 router.get(
   "/all",
   useErrorHandler(async (req, res) => {
-    const { id } = req;
-    const journals = await Journal.find({ author_id: id });
+    const { user } = req;
+    const journals = await Journal.find({ "authors.email": user!.email });
     res.json({ success: true, journals });
   })
 );
@@ -37,8 +37,8 @@ router.get(
   "/draft/:id",
   useErrorHandler(
     async (req, res) => {
-      const { id, params } = req;
-      const { versions, ...journal } = (await Journal.findOne({ author_id: id, journal_id: params.id }))!;
+      const { user, params } = req;
+      const { versions, ...journal } = (await Journal.findOne({ corresponding_author: user!.email, journal_id: params.id }))!;
       const { name, link } = versions[0] || {};
       res.json({ success: true, journal: { ...journal, file: { name, link } } });
     },
@@ -52,19 +52,19 @@ router.post(
   checksize(false),
   useErrorHandler(
     async (req, res) => {
-      const { body, file, id, user } = req;
-      const { journal_id, title, abstract, uploadFile, keywords, reviewers } = await draftSchema.parseAsync(body);
+      const { body, file, user } = req;
+      const { journal_id, title, abstract, uploadFile, keywords, corresponding_author, authors, reviewers } = await draftSchema.parseAsync(body);
       if (uploadFile === "new") {
         var { originalname, filename, path } = file!;
         var link = sign(await uploadCloudinary(filename, path), LINK_SECRET);
       }
 
-      let journal = await Journal.findOne({ journal_id, author_id: id });
+      let journal = await Journal.findOne({ journal_id, corresponding_author: user!.email });
       if (!journal) {
         journal = await Journal.create({
           journal_id: "Draft" + Date.now(),
-          author_id: id,
-          author_name: user!.name,
+          corresponding_author,
+          authors,
           title,
           abstract,
           keywords,
@@ -98,19 +98,19 @@ router.post(
   checksize,
   useErrorHandler(
     async (req, res) => {
-      const { body, file, id, user } = req;
-      const { journal_id, title, abstract, keywords, reviewers } = await submitSchema.parseAsync(body);
+      const { body, file, user } = req;
+      const { journal_id, title, abstract, keywords, corresponding_author, authors, reviewers } = await submitSchema.parseAsync(body);
       const { originalname, filename, path } = file!;
       const link = sign(await uploadCloudinary(filename, path), LINK_SECRET);
 
-      let journal = await Journal.findOne({ journal_id, author_id: id });
+      let journal = await Journal.findOne({ journal_id, corresponding_author: user!.email });
       const count = await Journal.countDocuments({ journal_id: { $regex: `^${currentYear}${currentVolume}` } });
       const newJournalId = currentYear + numToString(+currentVolume, 3) + numToString(count);
       if (!journal) {
         journal = await Journal.create({
           journal_id: newJournalId,
-          author_id: id,
-          author_name: user!.name,
+          corresponding_author,
+          authors,
           title,
           abstract,
           keywords,
@@ -120,6 +120,8 @@ router.post(
       } else {
         const updatedJournal: Partial<JournalType> = {};
         updatedJournal.journal_id = newJournalId;
+        updatedJournal.corresponding_author = corresponding_author;
+        updatedJournal.authors = authors as any;
         updatedJournal.title = title;
         updatedJournal.abstract = abstract;
         updatedJournal.keywords = keywords;
@@ -139,8 +141,8 @@ router.post(
 router.get(
   "/fetch/:id",
   useErrorHandler(async (req, res) => {
-    const { params, id } = req;
-    const journal = await Journal.findOne({ journal_id: params.id, author_id: id });
+    const { params, user } = req;
+    const journal = await Journal.findOne({ journal_id: params.id, "authors.email": user!.email });
     res.json({ success: true, journal });
   })
 );
@@ -154,14 +156,14 @@ router.post(
   checksize,
   useErrorHandler(
     async (req, res) => {
-      const { body, files, id } = req;
+      const { body, files, user } = req;
       const { journal_id } = await finalSchema.parseAsync(body);
       let { copyright, printversion } = files! as { copyright: File[]; printversion: File[] };
       const copyrightFile = copyright[0]!;
       const printversionFile = printversion[0]!;
       const copyrightLink = sign(await uploadCloudinary(copyrightFile.filename, copyrightFile.path), LINK_SECRET);
       const printversionLink = sign(await uploadCloudinary(printversionFile.filename, printversionFile.path), LINK_SECRET);
-      await Journal.findOneAndUpdate({ journal_id, author_id: id }, { copyright: copyrightLink, print_version: printversionLink });
+      await Journal.findOneAndUpdate({ journal_id, corresponding_author: user!.email }, { copyright: copyrightLink, print_version: printversionLink });
       await deleteFiles(req);
       res.json({ success: true, msg: "Files submitted successfully!" });
     },

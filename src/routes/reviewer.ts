@@ -9,6 +9,7 @@ router.get(
   "/all",
   fetchuser(),
   useErrorHandler(async (req, res) => {
+    // THIS ROUTE NEEDS TO BE FIXED
     const { id } = req;
     const user = await User.findById(id).populate("journal_ids");
     const journal_ids = user?.journal_ids!;
