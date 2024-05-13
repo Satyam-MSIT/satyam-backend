@@ -12,6 +12,7 @@ export const draftSchema = z.object({
       z.object({
         name: z.string(),
         email: z.string().email(),
+        affiliation: z.string(),
       })
     )
     .optional(),
@@ -20,6 +21,8 @@ export const draftSchema = z.object({
       z.object({
         name: z.string(),
         email: z.string().email(),
+        affiliation: z.string(),
+        mobile: z.string(),
       })
     )
     .optional(),
@@ -33,6 +36,19 @@ export const submitSchema = z.object({
   title: z.string(),
   keywords: z.array(z.string()),
   corresponding_author: z.string().email(),
-  authors: z.array(z.object({ name: z.string(), email: z.string().email() })),
-  reviewers: z.array(z.object({ name: z.string(), email: z.string().email() })),
+  authors: z.array(
+    z.object({
+      name: z.string(),
+      email: z.string().email(),
+      affiliation: z.string(),
+    })
+  ),
+  reviewers: z.array(
+    z.object({
+      name: z.string(),
+      email: z.string().email(),
+      affiliation: z.string(),
+      mobile: z.string(),
+    })
+  ),
 });

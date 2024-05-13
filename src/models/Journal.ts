@@ -29,6 +29,7 @@ export const journalSchema = new Schema(
         {
           name: String,
           email: String,
+          affiliation: String,
         },
       ],
       default: [],
@@ -45,6 +46,8 @@ export const journalSchema = new Schema(
         {
           name: { type: String },
           email: { type: String },
+          affiliation: { type: String },
+          mobile: { type: String },
           status: { type: String, default: "pending", enum: ["accepted", "rejected", "pending"] },
         },
       ],
