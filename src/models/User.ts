@@ -1,6 +1,6 @@
 import { InferSchemaType, Schema, Types, model } from "mongoose";
 import { reviewerSchema } from "./Reviewer";
-import { types } from "../constants";
+import { userTypes } from "../constants";
 
 const userSchema = new Schema(
   {
@@ -9,7 +9,7 @@ const userSchema = new Schema(
     mobile: { type: String },
     password: { type: String, required: true },
     lastPasswordModifiedAt: { type: Number, default: Date.now },
-    type: { type: String, required: true, enum: types },
+    type: { type: String, required: true, enum: userTypes },
     image: { type: String },
     active: { type: Boolean, default: true },
     confirmed: { type: Boolean, default: false },

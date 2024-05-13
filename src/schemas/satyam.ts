@@ -1,13 +1,8 @@
 import { z } from "zod";
-import { types } from "../constants";
+import { userTypes } from "../constants";
 
 export const editSchema = z.object({
   name: z.string().optional(),
-  type: z.enum(types).optional(),
+  type: z.enum(userTypes).optional(),
   active: z.boolean().optional(),
-});
-
-export const emailSchema = z.object({
-  subject: z.string(),
-  html: z.string(),
 });

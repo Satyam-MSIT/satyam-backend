@@ -1,10 +1,19 @@
 import { Router } from "express";
-
 import Newsletter from "../models/Newsletter";
-import { subscribeSchema, unsubscribeSchema } from "../schemas/newsletter";
+import { announcementSchema, subscribeSchema, unsubscribeSchema } from "../schemas/newsletter";
 import useErrorHandler from "../middlewares/useErrorHandler";
+import { upload, uploadCloudinary } from "../modules/upload";
+import { generateMessage, sendMail } from "../modules/nodemailer";
+import { File, deleteFiles } from "../modules/file";
+import fetchuser from "../middlewares/fetchuser";
+import verifyAdmin from "../middlewares/verifyAdmin";
+import Announcement from "../models/Announcement";
+import { usePromises } from "../modules/promise";
+import { sign } from "jssign";
 
 const router = Router();
+
+const { LINK_SECRET } = process.env;
 
 router.post(
   "/subscribe",
@@ -26,6 +35,28 @@ router.post(
     await Newsletter.findOneAndDelete({ email });
     res.json({ success: true, msg: "Successfully unsubscribed to the Newsletter!" });
   })
+);
+
+router.post(
+  "/announcement",
+  fetchuser(),
+  verifyAdmin(),
+  upload.array("files"),
+  useErrorHandler(
+    async (req, res) => {
+      const { type, subject, html } = await announcementSchema.parseAsync(req.body);
+      const files = (req.files as File[]) || [];
+      const links = await usePromises(
+        files.map(async ({ filename, path }) => sign(await uploadCloudinary(filename, path), LINK_SECRET)),
+        true
+      );
+      await Announcement.create({ type, subject, description: html, links });
+      const email = (await Newsletter.find().select("email")).map(({ email }) => email);
+      await sendMail(generateMessage({ email, subject, html, files }));
+      res.json({ success: true, msg: "Announcement made successfully!" });
+    },
+    { onError: (_, req) => deleteFiles(req) }
+  )
 );
 
 export default router;

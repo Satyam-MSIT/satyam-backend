@@ -3,13 +3,9 @@ import { Router } from "express";
 import fetchuser from "../middlewares/fetchuser";
 import verifyAdmin from "../middlewares/verifyAdmin";
 import User from "../models/User";
-import { editSchema, emailSchema } from "../schemas/satyam";
+import { editSchema } from "../schemas/satyam";
 import { removeStorage } from "../modules/storage";
 import useErrorHandler from "../middlewares/useErrorHandler";
-import { deleteFiles } from "../modules/file";
-import { upload } from "../modules/upload";
-import { generateMessage, sendMail } from "../modules/nodemailer";
-import Newsletter from "../models/Newsletter";
 
 const router = Router();
 
@@ -65,22 +61,6 @@ router.delete(
       res.json({ success: true, msg: "User deleted successfully!" });
     },
     { statusCode: 404, error: "User not found!" }
-  )
-);
-
-router.post(
-  "/email",
-  upload.array("files"),
-  useErrorHandler(
-    async (req, res) => {
-      const { subject, html } = await emailSchema.parseAsync(req.body);
-      const email = (await Newsletter.find().select("email")).map(({ email }) => email);
-      await sendMail(generateMessage({ email, subject, html }));
-      res.json({ success: true, msg: "Mails sent successfully!" });
-    },
-    {
-      onError: (_, req) => deleteFiles(req),
-    }
   )
 );
 

@@ -33,10 +33,8 @@ router.post(
   fetchuser(),
   verifyAdmin(),
   useErrorHandler(async (req, res) => {
-    let { number, title, description, keywords, acceptanceTill, publishDate, acceptancePing, reviewPing, subject, html } = await volumeSchema.parseAsync(req.body);
+    let { number, title, description, keywords, acceptanceTill, publishDate, acceptancePing, reviewPing } = await volumeSchema.parseAsync(req.body);
     await Volume.create({ number, title, description, keywords, acceptanceTill, publishDate, acceptancePing, reviewPing });
-    const email = (await Newsletter.find().select("email")).map(({ email }) => email);
-    await sendMail(generateMessage({ email, subject, html }));
     res.json({ success: true, msg: "Call for papers created successfully!" });
   })
 );

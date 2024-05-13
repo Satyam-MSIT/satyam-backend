@@ -32,10 +32,7 @@ export function generateMessage({ id, name, email, subject, html, files }: Gener
   const messageExtensions: { [key in MessageType]: SendMailOptions } = {
     default: {
       subject,
-      html: `<div>
-        <h4>Hi, ${name}</h4>
-        ${html}
-      </div>`,
+      html,
       attachments: files?.map(({ filename, path }) => ({ filename, path })),
     },
     confirm: {
