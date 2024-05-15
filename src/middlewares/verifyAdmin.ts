@@ -10,8 +10,10 @@ export default function verifyAdmin(authCondition?: ConditionFunction): RequestH
       req.data = await signupSchema.parseAsync(req.body);
       if (req.user?.type === "satyam-admin" || authCondition?.(req)) return next();
       authenticationError(res);
-    } catch {
+      console.log(req.user)
+    } catch (e) {
       authenticationError(res);
+      console.log(e);
     }
   };
 }
