@@ -17,5 +17,3 @@ export const editSchema = z.object({
   name: z.string().min(1).max(50).optional(),
   mobile: z.string().optional(),
 });
-
-export type SignupData = z.infer<typeof signupSchema>;

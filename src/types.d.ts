@@ -1,14 +1,10 @@
 import { UserType } from "./models/User";
-import { SignupData } from "./schemas/auth";
-
-export {};
 
 declare global {
   namespace Express {
     interface Request {
       id?: string;
       user?: UserType;
-      data?: SignupData;
     }
   }
   namespace NodeJS {

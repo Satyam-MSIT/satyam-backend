@@ -11,7 +11,7 @@ import { otpExpiry } from "../constants";
 import { generateMessage, sendMail } from "../modules/nodemailer";
 import { getStorage, removeStorage, setStorage } from "../modules/storage";
 import { generateToken, sanitizeUserAgent } from "../modules/token";
-import { editSchema, forgotSchema, loginSchema, otpSchema } from "../schemas/auth";
+import { editSchema, forgotSchema, loginSchema, otpSchema, signupSchema } from "../schemas/auth";
 import { upload, uploadCloudinary } from "../modules/upload";
 import { deleteFile } from "../modules/file";
 import useErrorHandler from "../middlewares/useErrorHandler";
@@ -21,9 +21,9 @@ const router = Router();
 router.post(
   "/signup",
   fetchuser(false),
-  verifyAdmin((req) => !req.data!.type.startsWith("satyam")),
+  verifyAdmin((req) => !(req.body.type as string)?.startsWith("satyam")),
   useErrorHandler(async (req, res) => {
-    const { name, email, password, type, mobile } = req.data!;
+    const { name, email, password, type, mobile } = await signupSchema.parseAsync(req.body);
     let user = await User.findOne({ email });
     if (user?.confirmed) return res.status(400).json({ success: false, error: "Email already exists" });
     res.json({ success: true, msg: "Satyam account created successfully, please confirm your account via email to proceed!" });
