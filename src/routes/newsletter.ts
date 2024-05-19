@@ -55,7 +55,7 @@ router.post(
       await sendMail(generateMessage({ email, subject, html, files }));
       res.json({ success: true, msg: "Announcement made successfully!" });
     },
-    { onError: (_, req) => deleteFiles(req) }
+    { log: true, onError: (_, req) => deleteFiles(req) }
   )
 );
 

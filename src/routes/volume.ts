@@ -32,11 +32,14 @@ router.post(
   "/call",
   fetchuser(),
   verifyAdmin(),
-  useErrorHandler(async (req, res) => {
-    let { number, title, description, keywords, acceptanceTill, publishDate, acceptancePing, reviewPing } = await volumeSchema.parseAsync(req.body);
-    await Volume.create({ number, title, description, keywords, acceptanceTill, publishDate, acceptancePing, reviewPing });
-    res.json({ success: true, msg: "Call for papers created successfully!" });
-  })
+  useErrorHandler(
+    async (req, res) => {
+      let { number, title, description, keywords, acceptanceTill, publishDate, acceptancePing, reviewPing } = await volumeSchema.parseAsync(req.body);
+      await Volume.create({ number, title, description, keywords, acceptanceTill, publishDate, acceptancePing, reviewPing });
+      res.json({ success: true, msg: "Call for papers created successfully!" });
+    },
+    { log: true }
+  )
 );
 
 export default router;
