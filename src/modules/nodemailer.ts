@@ -26,7 +26,7 @@ const transporter = createTransport({
 });
 
 export function generateMessage({ id, name, email, subject, html, files }: GenerateMessageOptions, type: MessageType = "default", { otp }: GenerateMessageProps = {}): SendMailOptions {
-  const baseMessage = { to: email };
+  const baseMessage: Partial<SendMailOptions> = { bcc: email };
   const messageExtensions: { [key in MessageType]: SendMailOptions } = {
     default: {
       subject,
