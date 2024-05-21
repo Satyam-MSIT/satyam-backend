@@ -12,7 +12,7 @@ import { generateMessage, sendMail } from "../modules/nodemailer";
 import { getStorage, removeStorage, setStorage } from "../modules/storage";
 import { generateToken, sanitizeUserAgent } from "../modules/token";
 import { editSchema, forgotSchema, loginSchema, otpSchema, signupSchema } from "../schemas/auth";
-import { upload, uploadCloudinary } from "../modules/upload";
+import { imageUpload, uploadCloudinary } from "../modules/upload";
 import { deleteFile } from "../modules/file";
 import useErrorHandler from "../middlewares/useErrorHandler";
 
@@ -104,7 +104,7 @@ router.post(
 router.put(
   "/edit",
   fetchuser(),
-  upload.single("image"),
+  imageUpload.single("image"),
   useErrorHandler(
     async (req, res) => {
       const { body, id, file } = req;

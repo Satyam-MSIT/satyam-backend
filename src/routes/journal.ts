@@ -3,7 +3,7 @@ import { sign } from "jssign";
 
 import Journal, { JournalType } from "../models/Journal";
 import checksize from "../middlewares/checksize";
-import { deleteMega, upload, uploadCloudinary, uploadMega } from "../modules/upload";
+import { deleteMega, pdfUpload, upload, uploadCloudinary, uploadMega } from "../modules/upload";
 import { File, deleteFile, deleteFiles, getFiles } from "../modules/file";
 import fetchuser from "../middlewares/fetchuser";
 import { draftSchema, finalSchema, submitSchema } from "../schemas/journal";
@@ -48,7 +48,7 @@ router.get(
 
 router.post(
   "/draft",
-  upload.single("pdf"),
+  pdfUpload.single("pdf"),
   checksize(false),
   useErrorHandler(
     async (req, res) => {
@@ -94,7 +94,7 @@ router.post(
 
 router.post(
   "/submit",
-  upload.single("pdf"),
+  pdfUpload.single("pdf"),
   checksize,
   useErrorHandler(
     async (req, res) => {

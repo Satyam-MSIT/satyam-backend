@@ -2,19 +2,22 @@ import { Storage } from "megajs";
 import { createReadStream } from "fs";
 import { v2 } from "cloudinary";
 import multer from "multer";
-import path from "path";
 
 const { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME, MEGA_EMAIL, MEGA_PASSWORD } = process.env;
 let mega: Storage;
-const filetypes = /pdf/;
+const pdfMimeType = /pdf/;
+const imageMimeType = /pdf/;
 
-export const upload = multer({
+export const upload = multer({ dest: "uploads" });
+
+export const pdfUpload = multer({
   dest: "uploads",
-  fileFilter: function (_, file, cb) {
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
-    return cb(null, mimetype && extname);
-  },
+  fileFilter: (_, file, cb) => cb(null, pdfMimeType.test(file.mimetype)),
+});
+
+export const imageUpload = multer({
+  dest: "uploads",
+  fileFilter: (_, file, cb) => cb(null, imageMimeType.test(file.mimetype)),
 });
 
 export const initUpload = async () => {
