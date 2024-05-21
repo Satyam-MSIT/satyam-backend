@@ -22,7 +22,7 @@ router.get(
 router.get(
   "/latest",
   useErrorHandler(async (_, res) => {
-    const volume = (await Volume.findOne().sort("-number"))!;
+    const volume = (await Volume.findOne({ status: "published" }).sort("-number"))!;
     const journals = await Journal.find({ journal_id: { $regex: `^\d{2}${volume.number}` } });
     res.json({ success: true, volume, journals });
   })

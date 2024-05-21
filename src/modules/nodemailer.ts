@@ -1,12 +1,10 @@
 import { SendMailOptions, createTransport } from "nodemailer";
 import { sign } from "jsonwebtoken";
 import { retryAsync } from "utility-kit";
-import { expiresIn } from "../constants";
+import { emailTypes, expiresIn } from "../constants";
 import { File } from "./file";
 
-const types = ["default", "confirm", "otp"] as const;
-
-type MessageType = (typeof types)[number];
+type MessageType = (typeof emailTypes)[number];
 
 type GenerateMessageOptions = {
   id?: string;
