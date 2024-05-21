@@ -3,3 +3,5 @@ dist
 .env
 storage
 uploads
+pdfs
+images

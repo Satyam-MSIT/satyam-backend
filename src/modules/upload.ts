@@ -11,12 +11,12 @@ const imageMimeType = /pdf/;
 export const upload = multer({ dest: "uploads" });
 
 export const pdfUpload = multer({
-  dest: "uploads",
+  dest: "pdfs",
   fileFilter: (_, file, cb) => cb(null, pdfMimeType.test(file.mimetype)),
 });
 
 export const imageUpload = multer({
-  dest: "uploads",
+  dest: "images",
   fileFilter: (_, file, cb) => cb(null, imageMimeType.test(file.mimetype)),
 });
 
