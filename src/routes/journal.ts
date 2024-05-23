@@ -78,8 +78,8 @@ router.post(
         updatedJournal.keywords = keywords;
         updatedJournal.reviewers = reviewers as any;
         if (uploadFile !== "keep") {
-          const file = journal.versions[0];
-          if (file) await deleteMega(file.name);
+          // const file = journal.versions[0];
+          // if (file) await deleteMega(file.name);
           if (uploadFile === "new") updatedJournal.versions = [{ link: link!, name: originalname!, filename: filename! }] as any;
           else updatedJournal.versions = [] as any;
         }
@@ -126,15 +126,15 @@ router.post(
         updatedJournal.abstract = abstract;
         updatedJournal.keywords = keywords;
         updatedJournal.reviewers = reviewers as any;
-        const file = journal.versions[0];
-        if (file) await deleteMega(file.name);
+        // const file = journal.versions[0];
+        // if (file) await deleteMega(file.name);
         updatedJournal.versions = [{ link: link!, name: originalname!, filename: filename! }] as any;
         await journal.updateOne(updatedJournal);
       }
       await deleteFile(path!);
       res.json({ success: true, msg: "Journal submitted successfully!", journal_id: journal.journal_id });
     },
-    { onError: (_, req) => deleteFile(req.file) }
+    { log: true, onError: (_, req) => deleteFile(req.file) }
   )
 );
 
