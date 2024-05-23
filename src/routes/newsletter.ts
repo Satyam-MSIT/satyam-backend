@@ -9,11 +9,8 @@ import fetchuser from "../middlewares/fetchuser";
 import verifyAdmin from "../middlewares/verifyAdmin";
 import Announcement from "../models/Announcement";
 import { usePromises } from "../modules/promise";
-import { sign } from "jssign";
 
 const router = Router();
-
-const { LINK_SECRET } = process.env;
 
 router.post(
   "/subscribe",
@@ -47,7 +44,7 @@ router.post(
       const { type, subject, html } = await announcementSchema.parseAsync(req.body);
       const files = (req.files as File[]) || [];
       const links = await usePromises(
-        files.map(async ({ filename, path }) => sign(await uploadCloudinary(filename, path), LINK_SECRET)),
+        files.map(async ({ filename, path }) => await uploadCloudinary(filename, path)),
         true
       );
       await Announcement.create({ type, subject, description: html, links });

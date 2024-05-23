@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { sign } from "jssign";
 
 import Journal, { JournalType } from "../models/Journal";
 import checksize from "../middlewares/checksize";
@@ -13,8 +12,6 @@ import useErrorHandler from "../middlewares/useErrorHandler";
 let currentYear: string, currentVolume: string;
 
 const router = Router();
-
-const { LINK_SECRET } = process.env;
 
 export async function initVolume() {
   const { createdAt, number } = await getLatestVolume();
@@ -56,7 +53,7 @@ router.post(
       const { journal_id, title, abstract, uploadFile, keywords, corresponding_author, authors, reviewers } = await draftSchema.parseAsync(body);
       if (uploadFile === "new") {
         var { originalname, filename, path } = file!;
-        var link = sign(await uploadCloudinary(filename, path), LINK_SECRET);
+        var link = await uploadCloudinary(filename, path);
       }
 
       let journal = await Journal.findOne({ journal_id, corresponding_author: user!.email });
@@ -99,9 +96,11 @@ router.post(
   useErrorHandler(
     async (req, res) => {
       const { body, file, user } = req;
-      const { journal_id, title, abstract, keywords, corresponding_author, authors, reviewers } = await submitSchema.parseAsync(body);
-      const { originalname, filename, path } = file!;
-      const link = sign(await uploadCloudinary(filename, path), LINK_SECRET);
+      const { journal_id, title, abstract, uploadFile, keywords, corresponding_author, authors, reviewers } = await submitSchema.parseAsync(body);
+      if (uploadFile === "new") {
+        var { originalname, filename, path } = file!;
+        var link = await uploadCloudinary(filename, path);
+      }
 
       let journal = await Journal.findOne({ journal_id, corresponding_author: user!.email });
       const count = await Journal.countDocuments({ journal_id: { $regex: `^${currentYear}${currentVolume}` } });
@@ -126,12 +125,14 @@ router.post(
         updatedJournal.abstract = abstract;
         updatedJournal.keywords = keywords;
         updatedJournal.reviewers = reviewers as any;
-        // const file = journal.versions[0];
-        // if (file) await deleteMega(file.name);
-        updatedJournal.versions = [{ link: link!, name: originalname!, filename: filename! }] as any;
+        if (uploadFile === "new") {
+          // const file = journal.versions[0];
+          // if (file) await deleteMega(file.name);
+          updatedJournal.versions = [{ link: link!, name: originalname!, filename: filename! }] as any;
+        }
         await journal.updateOne(updatedJournal);
       }
-      await deleteFile(path!);
+      if (uploadFile === "new") await deleteFile(path!);
       res.json({ success: true, msg: "Journal submitted successfully!", journal_id: journal.journal_id });
     },
     { log: true, onError: (_, req) => deleteFile(req.file) }
@@ -161,8 +162,8 @@ router.post(
       let { copyright, printversion } = files! as { copyright: File[]; printversion: File[] };
       const copyrightFile = copyright[0]!;
       const printversionFile = printversion[0]!;
-      const copyrightLink = sign(await uploadCloudinary(copyrightFile.filename, copyrightFile.path), LINK_SECRET);
-      const printversionLink = sign(await uploadCloudinary(printversionFile.filename, printversionFile.path), LINK_SECRET);
+      const copyrightLink = await uploadCloudinary(copyrightFile.filename, copyrightFile.path);
+      const printversionLink = await uploadCloudinary(printversionFile.filename, printversionFile.path);
       await Journal.findOneAndUpdate({ journal_id, corresponding_author: user!.email }, { copyright: copyrightLink, print_version: printversionLink });
       await deleteFiles(req);
       res.json({ success: true, msg: "Files submitted successfully!" });

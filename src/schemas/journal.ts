@@ -34,6 +34,7 @@ export const submitSchema = z.object({
   journal_id: z.string().optional(),
   abstract: z.string(),
   title: z.string(),
+  uploadFile: z.enum(["new", "keep"]),
   keywords: z.array(z.string()),
   corresponding_author: z.string().email(),
   authors: z.array(
